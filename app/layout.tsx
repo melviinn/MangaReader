@@ -1,6 +1,7 @@
 import Providers from "@/lib/providers";
 import { Outfit } from "next/font/google";
 import { Metadata } from "next";
+import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${outfit.variable} antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

@@ -14,13 +14,12 @@ export async function GET(request: NextRequest) {
       url.searchParams.append("title", title);
     }
 
+    //TODO: Need to only get the main-streams mangas
     url.searchParams.append("limit", limit.toString());
     url.searchParams.append("offset", offset.toString());
-
     url.searchParams.append("originalLanguage[]", "ja");
     url.searchParams.append("publicationDemographic[]", "shounen");
-    // url.searchParams.append("status", "ongoing");
-    // url.searchParams.append("contentRating[]", "safe");
+    // url.searchParams.append("contentRating[]", "safe"); // No hentai
     url.searchParams.append("includes[]", "cover_art");
     url.searchParams.append("order[followedCount]", "desc");
 
@@ -29,11 +28,12 @@ export async function GET(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
       },
+
       next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch manga data");
+      throw new Error("Failed to fetch manga data...");
     }
 
     const data = await response.json();
@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
           : null,
       };
     });
+
     return NextResponse.json({
       total: data.total,
       limit: data.limit,
