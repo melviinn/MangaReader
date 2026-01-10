@@ -1,18 +1,16 @@
-"use client"
-
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 type MangaPaginationProps = {
-  page: number;
+  currentPage: number;
   total?: number;
   limit?: number;
   onPageChange: (page: number | ((p: number) => number)) => void;
 };
 
 export function MangaPagination({
-  page,
+  currentPage,
   total = 0,
   limit = 25,
   onPageChange,
@@ -23,7 +21,7 @@ export function MangaPagination({
   const getPages = () => {
     const pages: number[] = [];
 
-    let startPage = Math.max(1, page - 2);
+    let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, startPage + maxPages - 1);
 
     if (endPage - startPage + 1 < maxPages) {
@@ -46,16 +44,16 @@ export function MangaPagination({
         variant="outline"
         size="icon"
         onClick={() => onPageChange((p) => Math.max(1, p - 1))}
-        disabled={page === 1}
+        disabled={currentPage === 1}
       >
-        <ChevronLeft className="h-4 w-4" />
+        <HugeiconsIcon icon={ArrowLeft01Icon} />
       </Button>
 
       {/* Pages */}
       {getPages().map((p) => (
         <Button
           key={p}
-          variant={p === page ? "default" : "outline"}
+          variant={p === currentPage ? "default" : "outline"}
           size="icon"
           onClick={() => onPageChange(p)}
         >
@@ -68,9 +66,9 @@ export function MangaPagination({
         variant="outline"
         size="icon"
         onClick={() => onPageChange((p) => Math.min(totalPages, p + 1))}
-        disabled={page === totalPages}
+        disabled={currentPage === totalPages}
       >
-        <ChevronRight className="h-4 w-4" />
+        <HugeiconsIcon icon={ArrowRight01Icon} />
       </Button>
     </div>
   );

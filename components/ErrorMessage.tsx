@@ -1,15 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Alert02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 type ErrorMessageProps = {
   message?: string;
 };
 
-export function ErrorMessage({ message = "Une erreur est survenue." }: ErrorMessageProps) {
+export function ErrorMessage({
+  message = "Une erreur est survenue.",
+}: ErrorMessageProps) {
   return (
-    <Card className="mt-12 border-red-500 bg-red-50">
-      <CardContent className="flex items-center gap-3 py-6 text-red-600">
-        <AlertCircle className="h-5 w-5" />
+    <Card className="mt-12 border-destructive">
+      <CardContent className="flex items-center gap-3 py-6 text-destructive">
+        <HugeiconsIcon icon={Alert02Icon} />
         <span className="text-sm">{message}</span>
       </CardContent>
     </Card>

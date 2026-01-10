@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ErrorMessage } from "../ErrorMessage";
 import { MangasSkeleton } from "../MangasSkeleton";
 import { MangasView } from "../MangasView";
-import { MangaPagination } from "../pagination";
+import { MangaPagination } from "../Pagination";
 // Types
 import { MangaResponseType } from "@/lib/types/mangaType";
 
@@ -64,8 +64,8 @@ export default function HomePage() {
     <main className="flex flex-col items-center py-8 space-y-8">
       <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit}>
         <Input
-          className="border p-2 mb-4 w-full"
           placeholder="Search mangas..."
+          type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
@@ -81,7 +81,11 @@ export default function HomePage() {
       {!isLoading && !isError && <MangasView mangas={data?.mangas} />}
 
       {/* No need to check for layout shift because it doesn't render if the mangas are not loaded */}
-      <MangaPagination page={page} total={data?.total} onPageChange={setPage} />
+      <MangaPagination
+        currentPage={page}
+        total={data?.total}
+        onPageChange={setPage}
+      />
 
       {/* <Pagination>
         <PaginationContent>
