@@ -2,9 +2,10 @@
 
 // Essential imports
 import { useQuery } from "@tanstack/react-query";
-import { FormEvent, useState } from "react";
+import React, { FormEvent, useState } from "react";
 // Components
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "../ErrorMessage";
 import { MangasSkeleton } from "../MangasSkeleton";
 import { MangasView } from "../MangasView";
@@ -60,15 +61,29 @@ export default function HomePage() {
     setSearch(searchInput);
   };
 
+  const onChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+
+    if (value.trim() === "") {
+      setPage(1);
+      setSearch("");
+    }
+  };
+
   return (
     <main className="flex flex-col items-center py-8 space-y-8">
-      <form className="w-full max-w-md mx-auto" onSubmit={handleSubmit}>
+      <form
+        className="flex w-full max-w-md items-center gap-2"
+        onSubmit={handleSubmit}
+      >
         <Input
           placeholder="Search mangas..."
           type="text"
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={onChangeValue}
         />
+        <Button type="submit">Search</Button>
       </form>
 
       {isLoading && <MangasSkeleton />}

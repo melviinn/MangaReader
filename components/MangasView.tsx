@@ -1,5 +1,6 @@
 import { MangaType } from "@/lib/types/mangaType";
 import Image from "next/image";
+import Link from "next/link";
 
 type MangasViewProps = {
   mangas?: MangaType[];
@@ -14,7 +15,11 @@ const MangasView = ({ mangas }: MangasViewProps) => {
         </div>
       ) : (
         mangas?.map((manga) => (
-          <div key={manga.id} className="w-50 space-y-2">
+          <Link
+            href={`manga/${manga.id}`}
+            key={manga.id}
+            className="w-50 space-y-2 cursor-pointer hover:opacity-90 transition"
+          >
             <div className="relative aspect-2/3 w-full overflow-hidden rounded">
               {manga.coverUrl && (
                 <Image
@@ -30,7 +35,7 @@ const MangasView = ({ mangas }: MangasViewProps) => {
             <h2 className="text-sm font-medium leading-tight text-center">
               {manga.title}
             </h2>
-          </div>
+          </Link>
         ))
       )}
     </div>

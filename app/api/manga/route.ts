@@ -19,7 +19,9 @@ export async function GET(request: NextRequest) {
     url.searchParams.append("offset", offset.toString());
     url.searchParams.append("originalLanguage[]", "ja");
     url.searchParams.append("publicationDemographic[]", "shounen");
-    // url.searchParams.append("contentRating[]", "safe"); // No hentai
+    url.searchParams.append("contentRating[]", "safe"); // No hentai
+    url.searchParams.append("contentRating[]", "suggestive"); // No hentai
+
     url.searchParams.append("includes[]", "cover_art");
     url.searchParams.append("order[followedCount]", "desc");
 
