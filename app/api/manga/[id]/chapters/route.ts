@@ -14,7 +14,7 @@ export async function GET(
     const url = new URL(`${process.env.BASE_API_URL}/manga/${id}/feed`);
     url.searchParams.append("translatedLanguage[]", "en");
     url.searchParams.append("order[chapter]", "asc");
-    url.searchParams.append("limit", "500");
+    url.searchParams.append("limit", "100");
 
     const res = await fetch(url.toString(), {
       headers: { "Content-Type": "application/json" },
