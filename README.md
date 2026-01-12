@@ -3,10 +3,10 @@
   <p>A modern, responsive manga reader built with Next.js 15</p>
 
   <p>
-    <a href="#features">Features</a> •
-    <a href="#tech-stack">Tech Stack</a> •
-    <a href="#getting-started">Getting Started</a> •
-    <a href="#screenshots">Screenshots</a>
+    <a href="#-features">Features</a> •
+    <a href="#-tech-stack">Tech Stack</a> •
+    <a href="#-getting-started">Getting Started</a> •
+    <a href="#-project-structure">Project Structure</a>
   </p>
 </div>
 
@@ -44,7 +44,7 @@
 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/manga-reader.git
+git clone https://github.com/melviinn/manga-reader.git
 cd manga-reader
 ```
 
@@ -130,5 +130,5 @@ This project is open source and available under the [MIT License](LICENSE).
 ---
 
 <div align="center">
-  <p>Made with ❤️ by <a href="https://github.com/yourusername">@melviinn</a></p>
+  <p>Made with ❤️ by <a href="https://github.com/melviinn">@melviinn</a></p>
 </div>
