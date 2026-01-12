@@ -1,8 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <h1>📚 Manga Reader</h1>
+  <p>A modern, responsive manga reader built with Next.js 15</p>
 
-## Getting Started
+  <p>
+    <a href="#features">Features</a> •
+    <a href="#tech-stack">Tech Stack</a> •
+    <a href="#getting-started">Getting Started</a> •
+    <a href="#screenshots">Screenshots</a>
+  </p>
+</div>
 
-First, run the development server:
+---
+
+## ✨ Features
+
+- 🔍 **Search & Browse** - Search through thousands of manga titles with real-time filtering
+- 🌍 **Multi-language Support** - Read manga in English, French, Spanish, Japanese, and German
+- 📖 **Chapter Navigation** - Seamless navigation between chapters with previous/next buttons
+- 💾 **Persistent Preferences** - Language preferences saved locally for each manga
+- 🎨 **Modern UI** - Clean, responsive design with dark mode support
+- ⚡ **Fast Performance** - Optimized with React Query for efficient data fetching and caching
+- 📱 **Mobile Friendly** - Fully responsive design that works on all devices
+
+## 🛠 Tech Stack
+
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components:** [shadcn/ui](https://ui.shadcn.com/)
+- **Icons:** [HugeIcons](https://hugeicons.com/)
+- **Data Fetching:** [TanStack Query (React Query)](https://tanstack.com/query)
+- **API:** [MangaDex API](https://api.mangadex.org/docs/)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/manga-reader.git
+cd manga-reader
+```
+
+2. Install dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Create a `.env.local` file in the root directory
+
+```env
+BASE_API_URL=https://api.mangadex.org
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+4. Run the development server
 
 ```bash
 npm run dev
@@ -10,27 +73,62 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+manga-reader/
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   └── manga/             # Manga pages
+├── components/            # React components
+│   ├── ui/               # shadcn/ui components
+│   └── layout/           # Layout components
+├── lib/                   # Utility functions and types
+└── public/               # Static assets
+```
 
-## Learn More
+## 🎯 Key Features Explained
 
-To learn more about Next.js, take a look at the following resources:
+### Smart Caching
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+React Query handles all data fetching with intelligent caching strategies, reducing unnecessary API calls and improving performance.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Language Persistence
 
-## Deploy on Vercel
+Your language preference is saved per manga using localStorage, so you can read different manga in different languages without switching back and forth.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Responsive Design
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built mobile-first with Tailwind CSS, the app adapts seamlessly to any screen size.
+
+### Chapter Navigation
+
+Sticky navigation bars with backdrop blur effects make it easy to move between chapters without losing your place.
+
+## 🤝 Contributing
+
+This is a solo project, but contributions are welcome! Feel free to:
+
+- Report bugs
+- Suggest new features
+- Submit pull requests
+
+## 📝 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgments
+
+- [MangaDex](https://mangadex.org/) for providing the API
+- [shadcn](https://twitter.com/shadcn) for the amazing UI components
+- [Vercel](https://vercel.com) for Next.js and hosting
+
+---
+
+<div align="center">
+  <p>Made with ❤️ by <a href="https://github.com/yourusername">Your Name</a></p>
+</div>
