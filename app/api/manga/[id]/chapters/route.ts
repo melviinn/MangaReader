@@ -1,20 +1,21 @@
 import { NextResponse } from "next/server";
 
 export async function GET(
-  _req: Request,
+  req: Request,
   props: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await props.params;
+    const { searchParams } = new URL(req.url);
+    const language = searchParams.get("language") || "en";
 
     if (!id) throw new Error("Manga ID is missing");
     if (!process.env.BASE_API_URL) throw new Error("BASE_API_URL not set");
 
-    // Endpoint correct
     const url = new URL(`${process.env.BASE_API_URL}/manga/${id}/feed`);
-    url.searchParams.append("translatedLanguage[]", "en");
+    url.searchParams.append("translatedLanguage[]", language);
     url.searchParams.append("order[chapter]", "asc");
-    url.searchParams.append("limit", "100");
+    url.searchParams.append("limit", "500");
 
     const res = await fetch(url.toString(), {
       headers: { "Content-Type": "application/json" },

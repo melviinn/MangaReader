@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import type { ChapterImagesType } from "@/lib/types/mangaType";
 import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
@@ -17,8 +18,10 @@ async function fetchChapterPages(
   return res.json();
 }
 
-async function fetchChaptersList(mangaId: string) {
-  const res = await fetch(`/api/manga/${mangaId}/chapters`);
+async function fetchChaptersList(mangaId: string, language: string) {
+  const res = await fetch(
+    `/api/manga/${mangaId}/chapters?language=${language}`
+  );
   if (!res.ok) throw new Error("Failed to load chapters");
   return res.json();
 }
@@ -28,6 +31,15 @@ export const ChapterView = () => {
   const router = useRouter();
   const chapterId = params.chapter as string;
   const mangaId = params.id as string;
+  const [language, setLanguage] = useState("en");
+
+  // Charger la langue depuis localStorage
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem(`manga_${mangaId}_language`);
+    if (savedLanguage) {
+      setLanguage(savedLanguage);
+    }
+  }, [mangaId]);
 
   const { data, isLoading, isError } = useQuery<ChapterImagesType>({
     queryKey: ["chapterPages", chapterId],
@@ -36,19 +48,22 @@ export const ChapterView = () => {
   });
 
   const { data: chaptersData, isLoading: chaptersLoading } = useQuery({
-    queryKey: ["chapters", mangaId],
-    queryFn: () => fetchChaptersList(mangaId),
-    enabled: !!mangaId,
-    staleTime: 1000 * 60 * 5, // 5 minutes - same as ChaptersList
-    placeholderData: (previousData) => previousData, // Keep showing old data while refetching
+    queryKey: ["chaptersNav", mangaId, language],
+    queryFn: () => fetchChaptersList(mangaId, language),
+    enabled: !!mangaId && !!language,
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (previousData) => previousData,
   });
 
   const chapters = chaptersData?.chapters || [];
+
   const currentChapterIndex = chapters.findIndex(
     (ch: any) => ch.id === chapterId
   );
 
-  // Show buttons immediately when we have chapter data, even if still loading in background
+  const currentChapterNumber =
+    currentChapterIndex !== -1 ? chapters[currentChapterIndex].chapter : null;
+
   const canShowButtons = chapters.length > 0 && currentChapterIndex !== -1;
   const prevChapter =
     canShowButtons && currentChapterIndex > 0
@@ -76,16 +91,8 @@ export const ChapterView = () => {
 
   const images = data.data;
 
-  if (images.length === 0) {
-    return (
-      <p className="text-center py-8 text-gray-500">
-        Aucune page disponible pour ce chapitre.
-      </p>
-    );
-  }
-
   return (
-    <main className="max-w-3xl mx-auto py-8 space-y-4">
+    <main className="max-w-3xl mx-0 md:mx-auto px-6 mx:px-0 py-8 space-y-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-semibold">Lecture du chapitre</h1>
       </div>
@@ -98,11 +105,11 @@ export const ChapterView = () => {
           className="flex items-center gap-2"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} />
-          Chapitre précédent
+          Précédent
         </Button>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-xs md:text-sm">
           {canShowButtons
-            ? `${currentChapterIndex + 1} / ${chapters.length}`
+            ? `${currentChapterNumber} / ${chapters.length}`
             : chaptersLoading
             ? "Chargement..."
             : ""}
@@ -113,24 +120,29 @@ export const ChapterView = () => {
           disabled={!nextChapter}
           className="flex items-center gap-2"
         >
-          Chapitre suivant
+          Suivant
           <HugeiconsIcon icon={ArrowRight01Icon} />
         </Button>
       </div>
 
-      <div className="space-y-4">
-        {images.map((filename, index) => (
-          <Image
-            key={index}
-            src={`/api/manga/chapter/${chapterId}/image/${filename}`}
-            alt={`Page ${index + 1}`}
-            width={800}
-            height={1200}
-            className="w-full rounded shadow"
-            // loading="lazy"
-          />
-        ))}
-      </div>
+      {images.length === 0 ? (
+        <p className="text-center py-8 text-gray-500">
+          Aucune page disponible pour ce chapitre.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {images.map((filename, index) => (
+            <Image
+              key={index}
+              src={`/api/manga/chapter/${chapterId}/image/${filename}`}
+              alt={`Page ${index + 1}`}
+              width={800}
+              height={1200}
+              className="w-full rounded shadow"
+            />
+          ))}
+        </div>
+      )}
     </main>
   );
 };

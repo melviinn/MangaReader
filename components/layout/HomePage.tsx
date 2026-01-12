@@ -2,28 +2,20 @@
 
 // Essential imports
 import { useQuery } from "@tanstack/react-query";
-import React, { FormEvent, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import type React from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 // Components
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "../ErrorMessage";
 import { MangasSkeleton } from "../MangasSkeleton";
 import { MangasView } from "../MangasView";
 import { MangaPagination } from "../Pagination";
 // Types
-import { MangaResponseType } from "@/lib/types/mangaType";
+import type { MangaResponseType } from "@/lib/types/mangaType";
+import { SearchInput } from "../SearchInput";
 
-// import {
-// 	Pagination,
-// 	PaginationContent,
-// 	PaginationEllipsis,
-// 	PaginationItem,
-// 	PaginationLink,
-// 	PaginationNext,
-// 	PaginationPrevious,
-// } from "@/components/ui/pagination";
-
-const LIMIT = 25;
+const LIMIT = 24;
 
 async function fetchMangas(
   search: string,
@@ -45,9 +37,26 @@ async function fetchMangas(
 }
 
 export default function HomePage() {
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const [page, setPage] = useState(1);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isUserTyping = useRef(false);
+
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [searchInput, setSearchInput] = useState(
+    searchParams.get("search") || ""
+  );
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+
+  useEffect(() => {
+    if (!isUserTyping.current) {
+      const urlSearch = searchParams.get("search") || "";
+      const urlPage = Number(searchParams.get("page")) || 1;
+
+      setSearch(urlSearch);
+      setSearchInput(urlSearch);
+      setPage(urlPage);
+    }
+  }, [searchParams]);
 
   const { data, isLoading, isError } = useQuery<MangaResponseType, Error>({
     queryKey: ["mangas", search, page],
@@ -55,36 +64,65 @@ export default function HomePage() {
     staleTime: 1000 * 60,
   });
 
+  const updateURL = (newSearch: string, newPage: number) => {
+    const params = new URLSearchParams();
+    if (newSearch.trim()) {
+      params.set("search", newSearch);
+    }
+    if (newPage > 1) {
+      params.set("page", String(newPage));
+    }
+
+    const queryString = params.toString();
+    router.replace(queryString ? `/?${queryString}` : "/", { scroll: false });
+  };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    isUserTyping.current = false;
     setPage(1);
     setSearch(searchInput);
+    updateURL(searchInput, 1);
+    window.scrollTo(0, 0), { behavior: "smooth" };
   };
 
   const onChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    isUserTyping.current = true;
     setSearchInput(value);
 
     if (value.trim() === "") {
       setPage(1);
       setSearch("");
+      updateURL("", 1);
+      isUserTyping.current = false;
     }
   };
 
+  const handlePageChange = (newPage: number | ((p: number) => number)) => {
+    const resolvedPage =
+      typeof newPage === "function" ? newPage(page) : newPage;
+    setPage(resolvedPage);
+    updateURL(search, resolvedPage);
+    window.scrollTo(0, 0), { behavior: "smooth" };
+  };
+
   return (
-    <main className="flex flex-col items-center py-8 space-y-8">
-      <form
-        className="flex w-full max-w-md items-center gap-2"
-        onSubmit={handleSubmit}
-      >
-        <Input
-          placeholder="Search mangas..."
-          type="text"
-          value={searchInput}
-          onChange={onChangeValue}
-        />
-        <Button type="submit">Search</Button>
-      </form>
+    <main className="flex flex-col items-center space-y-6">
+      <div className="sticky top-0 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-4 pt-8">
+        <form
+          className="flex w-full max-w-md mx-auto items-center gap-2 px-4"
+          onSubmit={handleSubmit}
+        >
+          <SearchInput
+            placeholder="Search mangas..."
+            type="text"
+            value={searchInput}
+            onChange={onChangeValue}
+          />
+          <Button type="submit">Search</Button>
+        </form>
+      </div>
 
       {isLoading && <MangasSkeleton />}
 
@@ -96,74 +134,13 @@ export default function HomePage() {
       {!isLoading && !isError && <MangasView mangas={data?.mangas} />}
 
       {/* No need to check for layout shift because it doesn't render if the mangas are not loaded */}
-      <MangaPagination
-        currentPage={page}
-        total={data?.total}
-        onPageChange={setPage}
-      />
-
-      {/* <Pagination>
-        <PaginationContent>
-          {page !== 1 && (
-            <PaginationItem
-              className="cursor-pointer"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
-              <PaginationPrevious isActive={page !== 1} />
-            </PaginationItem>
-          )}
-
-          {getPages().map((p) => (
-            <PaginationItem
-              className="cursor-pointer"
-              key={p}
-              onClick={() => setPage(p)}
-            >
-              <PaginationLink
-                isActive={p === page}
-                className={
-                  p === page
-                    ? "bg-zinc-800 hover:bg-zinc-800/90 text-white transition-colors duration-150"
-                    : "hover:bg-zinc-600 hover:text-white transition-colors duration-150"
-                }
-              >
-                {p}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-
-          {totalPages > 5 &&
-            getPages()[getPages().length - 1] < totalPages - 1 && (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
-
-          {totalPages > 5 && getPages()[getPages().length - 1] < totalPages && (
-            <PaginationItem
-              onClick={() => setPage(totalPages)}
-              className="cursor-pointer"
-            >
-              <PaginationLink
-                className={
-                  getPages()[getPages().length - 1] == totalPages
-                    ? "bg-zinc-800 hover:bg-zinc-800/90 text-white transition-colors duration-150"
-                    : "hover:bg-zinc-600 hover:text-white transition-colors duration-150"
-                }
-              >
-                {totalPages}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-
-          <PaginationItem
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            className="cursor-pointer"
-          >
-            <PaginationNext isActive={page !== totalPages} />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination> */}
+      <div className="mb-8">
+        <MangaPagination
+          currentPage={page}
+          total={data?.total}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </main>
   );
 }

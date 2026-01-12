@@ -8,7 +8,7 @@ type MangasViewProps = {
 
 const MangasView = ({ mangas }: MangasViewProps) => {
   return (
-    <div className="flex flex-wrap gap-6 mt-8 justify-center md:max-w-2/3">
+    <div className="flex flex-wrap gap-6 mt-8 justify-center md:max-w-3/4">
       {mangas?.length === 0 ? (
         <div className="w-full text-center text-lg tracking-tight text-muted-foreground">
           Aucun manga trouvé.
@@ -16,7 +16,7 @@ const MangasView = ({ mangas }: MangasViewProps) => {
       ) : (
         mangas?.map((manga) => (
           <Link
-            href={`manga/${manga.id}`}
+            href={`/manga/${manga.id}?title=${encodeURIComponent(manga.title)}`}
             key={manga.id}
             className="w-50 space-y-2 cursor-pointer hover:opacity-90 transition"
           >
