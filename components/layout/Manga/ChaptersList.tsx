@@ -17,10 +17,10 @@ import { Suspense, useEffect, useState } from "react";
 
 async function fetchChapters(
   mangaId: string,
-  language: string
+  language: string,
 ): Promise<MangaChapterType[]> {
   const res = await fetch(
-    `/api/manga/${mangaId}/chapters?language=${language}`
+    `/api/manga/${mangaId}/chapters?language=${language}`,
   );
 
   if (!res.ok) {
@@ -96,7 +96,7 @@ function ChaptersListContent() {
     : chapters.filter(
         (chapter) =>
           chapter.chapter?.includes(search.trim()) ||
-          chapter.title?.toLowerCase().includes(search.trim().toLowerCase())
+          chapter.title?.toLowerCase().includes(search.trim().toLowerCase()),
       );
 
   return (
@@ -139,7 +139,7 @@ function ChaptersListContent() {
       {filteredChapters.length === 0 ? (
         <p className="text-center text-gray-500">Aucun chapitre trouvé.</p>
       ) : (
-        <ScrollArea className="h-[calc(100vh-300px)] w-full rounded-md border">
+        <ScrollArea className="max-h-[calc(100vh-300px)] min-h-37.5 w-full rounded-md border">
           <ul className="space-y-2 p-4">
             {filteredChapters.map((chapter) => (
               <div key={chapter.id}>
@@ -159,7 +159,10 @@ function ChaptersListContent() {
                     </span>
                   )}
                 </li>
-                <Separator className="my-2" />
+                {chapter.id !==
+                  filteredChapters[filteredChapters.length - 1].id && (
+                  <Separator className="my-2" />
+                )}
               </div>
             ))}
           </ul>
