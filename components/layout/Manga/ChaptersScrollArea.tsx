@@ -1,6 +1,6 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import type { MangaChapterType } from "@/lib/types/mangaType";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -16,36 +16,41 @@ export const ChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
 }) => {
   const router = useRouter();
 
-  if (!chapters || chapters.length === 0) return null;
+  if (!chapters?.length) return null;
 
   return (
-    <div className="h-min w-full rounded-md border overflow-hidden">
-      <div className="max-h-[calc(100vh-300px)] min-h-37.5 w-full rounded-md border overflow-y-auto scrollbar-thin">
-        <ul className="space-y-2 p-4">
-          {chapters.map((chapter) => (
-            <div key={chapter.id}>
-              <li
+    <div className="w-full rounded-md border bg-background">
+      <div className="max-h-96 overflow-y-auto scrollbar-thin">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 p-4">
+          {chapters.map((chapter) => {
+            const date = chapter.publishedAt
+              ? new Date(chapter.publishedAt).toLocaleDateString("fr-FR", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })
+              : null;
+
+            return (
+              <Button
+                key={chapter.id}
+                variant="secondary"
                 onClick={() => router.push(`/manga/${mangaId}/${chapter.id}`)}
-                className="flex justify-between items-center p-3 rounded transition cursor-pointer hover:bg-accent"
+                className="h-auto items-start justify-start flex flex-col gap-1 px-3 py-2 text-left
+                rounded-md border bg-muted/40 hover:bg-accent"
               >
-                <div>
-                  <span className="font-medium">
-                    Chapitre {chapter.chapter ?? "?"}
-                  </span>
-                  {chapter.title && ` – ${chapter.title}`}
-                </div>
-                {chapter.volume && (
-                  <span className="text-sm text-gray-400">
-                    Vol {chapter.volume}
+                <span className="font-medium text-foreground text-sm leading-tight">
+                  Chapitre {chapter.chapter ?? "?"}
+                </span>
+                {date && (
+                  <span className="text-xs text-muted-foreground/80">
+                    {date}
                   </span>
                 )}
-              </li>
-              {chapter.id !== chapters[chapters.length - 1].id && (
-                <Separator className="my-2" />
-              )}
-            </div>
-          ))}
-        </ul>
+              </Button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

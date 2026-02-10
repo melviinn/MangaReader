@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  props: { params: Promise<{ id: string }> }
+  props: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await props.params;
@@ -34,6 +34,8 @@ export async function GET(
       chapter: chapter.attributes.chapter,
       volume: chapter.attributes.volume,
       pages: chapter.attributes.pages,
+      publishedAt:
+        chapter.attributes.publishAt || chapter.attributes.createdAt || null,
     }));
 
     return NextResponse.json({ chapters });
@@ -41,7 +43,7 @@ export async function GET(
     console.error(error);
     return NextResponse.json(
       { error: "Failed to fetch chapters" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

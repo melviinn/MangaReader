@@ -60,28 +60,6 @@ const FlagEN: ReactSvgElement = (props) => {
   );
 };
 
-const FlagES: ReactSvgElement = (props) => {
-  return (
-    <svg width={24} height={24} fill="none" viewBox="0 0 24 24" {...props}>
-      <g clipPath="url(#ES_svg__a)">
-        <path
-          d="M0 12c0 1.467.264 2.873.746 4.173L12 17.217l11.254-1.044c.482-1.3.746-2.706.746-4.174 0-1.468-.264-2.874-.746-4.174L12 6.782.746 7.825A11.974 11.974 0 0 0 0 12Z"
-          fill="#FFDA44"
-        />
-        <path
-          d="M23.255 7.826C21.56 3.256 17.161 0 12.002 0 6.842 0 2.444 3.256.748 7.826h22.507ZM.747 16.174C2.443 20.744 6.841 24 12.001 24c5.16 0 9.558-3.256 11.253-7.826H.747Z"
-          fill="#D80027"
-        />
-      </g>
-      <defs>
-        <clipPath id="ES_svg__a">
-          <path fill="#fff" d="M0 0h24v24H0z" />
-        </clipPath>
-      </defs>
-    </svg>
-  );
-};
-
 const FlagJA: ReactSvgElement = (props) => {
   return (
     <svg width={24} height={24} fill="none" viewBox="0 0 24 24" {...props}>
@@ -104,30 +82,4 @@ const FlagJA: ReactSvgElement = (props) => {
   );
 };
 
-const FlagDE: ReactSvgElement = (props) => {
-  return (
-    <svg width={24} height={24} fill="none" viewBox="0 0 24 24" {...props}>
-      <g clipPath="url(#DE_svg__a)">
-        <path
-          d="M.746 16.175C2.442 20.745 6.84 24 12 24c5.16 0 9.558-3.257 11.253-7.826L12 15.132.746 16.175Z"
-          fill="#FFDA44"
-        />
-        <path
-          d="M12 0C6.84 0 2.442 3.258.746 7.828L12 8.87l11.253-1.043C21.558 3.257 17.16 0 12 0Z"
-          fill="#000"
-        />
-        <path
-          d="M.746 7.826A11.974 11.974 0 0 0 0 12c0 1.467.264 2.873.746 4.174h22.508c.482-1.3.746-2.707.746-4.174 0-1.468-.264-2.874-.746-4.174H.746Z"
-          fill="#D80027"
-        />
-      </g>
-      <defs>
-        <clipPath id="DE_svg__a">
-          <path fill="#fff" d="M0 0h24v24H0z" />
-        </clipPath>
-      </defs>
-    </svg>
-  );
-};
-
-export { FlagDE, FlagEN, FlagES, FlagFR, FlagJA };
+export { FlagEN, FlagFR, FlagJA };
