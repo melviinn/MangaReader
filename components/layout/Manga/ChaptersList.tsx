@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FlagDE, FlagEN, FlagES, FlagFR, FlagJA } from "@/public/flags";
 import { Separator } from "@/components/ui/separator";
 import type { MangaChapterType } from "@/lib/types/mangaType";
 import { useQuery } from "@tanstack/react-query";
@@ -32,11 +33,11 @@ async function fetchChapters(
 }
 
 const LANGUAGES = [
-  { code: "en", label: "English", flag: "🇬🇧" },
-  { code: "fr", label: "Français", flag: "🇫🇷" },
-  { code: "es", label: "Español", flag: "🇪🇸" },
-  { code: "ja", label: "日本語", flag: "🇯🇵" },
-  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+  { code: "en", label: "English", flag: <FlagEN /> },
+  { code: "fr", label: "Français", flag: <FlagFR /> },
+  { code: "es", label: "Español", flag: <FlagES /> },
+  { code: "ja", label: "日本語", flag: <FlagJA /> },
+  { code: "de", label: "Deutsch", flag: <FlagDE /> },
 ];
 
 function ChaptersListContent() {
@@ -108,7 +109,7 @@ function ChaptersListContent() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="text-2xl">
+            <Button variant="outline" size="icon">
               {currentLanguage?.flag || "🌐"}
             </Button>
           </DropdownMenuTrigger>
