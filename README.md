@@ -64,7 +64,6 @@ pnpm install
 
 ```env
 BASE_API_URL=https://api.mangadex.org
-NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 4. Run the development server
