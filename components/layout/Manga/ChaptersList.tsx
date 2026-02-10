@@ -8,13 +8,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { FlagDE, FlagEN, FlagES, FlagFR, FlagJA } from "@/public/flags";
-import { Separator } from "@/components/ui/separator";
 import type { MangaChapterType } from "@/lib/types/mangaType";
+import { FlagDE, FlagEN, FlagES, FlagFR, FlagJA } from "@/public/flags";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { ChaptersScrollArea } from "./ChaptersScrollArea";
 
 async function fetchChapters(
   mangaId: string,
@@ -140,34 +139,7 @@ function ChaptersListContent() {
       {filteredChapters.length === 0 ? (
         <p className="text-center text-gray-500">Aucun chapitre trouvé.</p>
       ) : (
-        <ScrollArea className="max-h-[calc(100vh-300px)] min-h-37.5 w-full rounded-md border">
-          <ul className="space-y-2 p-4">
-            {filteredChapters.map((chapter) => (
-              <div key={chapter.id}>
-                <li
-                  onClick={() => router.push(`/manga/${mangaId}/${chapter.id}`)}
-                  className="flex justify-between items-center p-3 rounded transition cursor-pointer hover:bg-accent"
-                >
-                  <div>
-                    <span className="font-medium">
-                      Chapitre {chapter.chapter ?? "?"}
-                    </span>
-                    {chapter.title && ` – ${chapter.title}`}
-                  </div>
-                  {chapter.volume && (
-                    <span className="text-sm text-gray-400">
-                      Vol {chapter.volume}
-                    </span>
-                  )}
-                </li>
-                {chapter.id !==
-                  filteredChapters[filteredChapters.length - 1].id && (
-                  <Separator className="my-2" />
-                )}
-              </div>
-            ))}
-          </ul>
-        </ScrollArea>
+        <ChaptersScrollArea chapters={filteredChapters} mangaId={mangaId} />
       )}
     </main>
   );

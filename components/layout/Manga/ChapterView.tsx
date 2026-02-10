@@ -156,6 +156,7 @@ export const ChapterView = () => {
                 width={800}
                 height={1200}
                 className="w-full rounded shadow"
+                loading="lazy"
               />
             ))}
           </div>
