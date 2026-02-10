@@ -45,7 +45,6 @@ export function MangaPagination({
         size="icon"
         onClick={() => onPageChange((p) => Math.max(1, p - 1))}
         disabled={currentPage === 1}
-        // className={`${currentPage === 1 ? "invisible" : ""}`}
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} />
       </Button>
