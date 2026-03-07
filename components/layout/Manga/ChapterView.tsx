@@ -106,7 +106,7 @@ export const ChapterView = () => {
         onClick={() => router.push(`/manga/${mangaId}`)}
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} />
-        Retourner à la liste des chapitres
+        Return to the chapters list
       </Button>
       <div className="max-w-3xl mx-0 md:mx-auto space-y-4">
         <div className="flex space-x-4 items-center mb-4">
@@ -123,7 +123,7 @@ export const ChapterView = () => {
             className="flex items-center gap-2"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} />
-            Précédent
+            Previous
           </Button>
           <span className="text-xs md:text-sm">
             {canShowButtons
@@ -138,7 +138,7 @@ export const ChapterView = () => {
             disabled={!nextChapter}
             className="flex items-center gap-2"
           >
-            Suivant
+            Next
             <HugeiconsIcon icon={ArrowRight01Icon} />
           </Button>
         </div>

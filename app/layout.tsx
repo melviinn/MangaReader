@@ -13,6 +13,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Manga Reader",
   description: "A simple manga reader",
+
 };
 
 export default function RootLayout({
