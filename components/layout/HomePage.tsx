@@ -3,7 +3,7 @@
 // Essential imports
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useCallback, useRef, useState } from "react";
 // Components
 import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "../ErrorMessage";
@@ -37,6 +37,7 @@ async function fetchMangas(
 export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const mangasSectionRef = useRef<HTMLDivElement>(null);
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [searchInput, setSearchInput] = useState(
@@ -65,62 +66,132 @@ export default function HomePage() {
     router.replace(searchParams ? `/?${searchParams}` : "/", { scroll: false });
   };
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    setPage(1);
-    setSearch(searchInput);
-    updateURL(searchInput, 1);
-    (window.scrollTo(0, 0), { behavior: "smooth" });
-  };
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      const submittedSearch = searchInput.trim();
 
-  const onChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchInput(value);
-
-    if (value.trim() === "") {
       setPage(1);
-      setSearch("");
-      updateURL("", 1);
-    }
-  };
+      setSearch(submittedSearch); // valeur "committed" après submit
+      updateURL(submittedSearch, 1);
+      mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    },
+    [searchInput, updateURL],
+  );
 
-  const handlePageChange = (newPage: number | ((p: number) => number)) => {
-    // If newPage is a function, call it with the current page to get the new page number
-    const resolvedPage =
-      typeof newPage === "function" ? newPage(page) : newPage;
-    setPage(resolvedPage);
-    updateURL(search, resolvedPage);
-    (window.scrollTo(0, 0), { behavior: "smooth" });
-  };
+  const onChangeValue = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setSearchInput(value);
+
+      if (value.trim() === "") {
+        setPage(1);
+        setSearch("");
+        updateURL("", 1);
+      }
+    },
+    [updateURL],
+  );
+
+  const handlePageChange = useCallback(
+    (newPage: number | ((p: number) => number)) => {
+      // If newPage is a function, call it with the current page to get the new page number
+      const resolvedPage =
+        typeof newPage === "function" ? newPage(page) : newPage;
+      setPage(resolvedPage);
+      updateURL(search, resolvedPage);
+      mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    },
+    [search, page, updateURL],
+  );
 
   return (
-    <main className="flex flex-col items-center space-y-6">
-      <div className="sticky top-0 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-4 pt-8">
-        <form
-          className="flex w-full max-w-md mx-auto items-center gap-2 px-4"
-          onSubmit={handleSubmit}
-        >
-          <SearchInput
-            placeholder="Search mangas..."
-            type="text"
-            value={searchInput}
-            onChange={onChangeValue}
-          />
-          <Button type="submit">Search</Button>
-        </form>
-      </div>
+    <main className="flex flex-col">
+      <section className="relative bg-background overflow-hidden">
+        {/* Subtle dot pattern background */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
+            backgroundSize: "24px 24px",
+          }}
+        />
 
-      {isLoading && <MangasSkeleton />}
+        <div className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+          <div className="flex flex-col items-center text-center">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-4 tracking-tight">
+              <span className="text-balance">Discover Your Next</span>
+              <br />
+              <span className="text-primary">Favorite Manga</span>
+            </h1>
+            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mb-8 text-pretty">
+              Browse thousands of mangas from action to romance. Find your next
+              adventure and start reading today.
+            </p>
 
-      {isError && (
-        <ErrorMessage message="Erreur lors du chargement des mangas." />
-      )}
+            {/* Search Form */}
+            <form
+              className="flex w-full max-w-xl items-center gap-3"
+              onSubmit={handleSubmit}
+            >
+              <SearchInput
+                placeholder="Search mangas..."
+                type="text"
+                value={searchInput}
+                onChange={onChangeValue}
+              />
+              <Button
+                type="submit"
+                className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
+              >
+                Search
+              </Button>
+            </form>
 
-      {/* No layout shift */}
-      {!isLoading && !isError && <MangasView mangas={data?.mangas} />}
+            {/* Stats */}
+            <div className="flex items-center gap-8 mt-10 text-sm">
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-primary">10K+</span>
+                <span className="text-muted-foreground">Manga Titles</span>
+              </div>
+              <div className="w-px h-10 bg-border" />
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-primary">500K+</span>
+                <span className="text-muted-foreground">Chapters</span>
+              </div>
+              <div className="w-px h-10 bg-border" />
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-primary">Free</span>
+                <span className="text-muted-foreground">Forever</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section ref={mangasSectionRef} className="py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          {isLoading && <MangasSkeleton />}
+
+          {isError && (
+            <ErrorMessage message="Erreur lors du chargement des mangas." />
+          )}
+
+          {!isLoading && !isError && (
+            <>
+              <div className="flex items-center mb-8">
+                <h2 className="text-2xl font-bold text-card-foreground">
+                  {search ? `Results for "${search}"` : "Popular Manga"}
+                </h2>
+              </div>
+              <MangasView mangas={data?.mangas} />
+            </>
+          )}
+        </div>
+      </section>
 
       {/* No need to check for layout shift because it doesn't render if the mangas are not loaded */}
-      <div className="mb-8">
+      <div className="mb-8 max-w-7xl mx-auto px-4">
         <MangaPagination
           currentPage={page}
           total={data?.total}
