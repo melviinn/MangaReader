@@ -36,10 +36,10 @@ export const ChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
                 key={chapter.id}
                 variant="secondary"
                 onClick={() => router.push(`/manga/${mangaId}/${chapter.id}`)}
-                className="h-auto items-start justify-start flex flex-col gap-1 px-3 py-2 text-left
-                rounded-md border bg-muted/40 hover:bg-accent"
+                className="h-auto group bg-card items-start justify-start flex flex-col gap-1 px-3 py-2 text-left
+                rounded-md border hover:border-primary/50 hover:bg-card/80 transition-all"
               >
-                <span className="font-medium text-foreground text-sm leading-tight">
+                <span className="font-medium text-foreground text-sm leading-tight group-hover:text-primary transition-colors">
                   Chapter {chapter.chapter ?? "?"}
                 </span>
                 {date && (

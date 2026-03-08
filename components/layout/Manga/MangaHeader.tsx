@@ -91,7 +91,7 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
                 <td className="pr-4">
                   {manga.authors.length > 0 && (
                     <p className="text-gray-300 text-sm mt-1">
-                      Auteur{manga.authors.length > 1 ? "s" : ""}:
+                      Author{manga.authors.length > 1 ? "s" : ""}:
                       <strong>
                         {" "}
                         {manga.authors.map((a) => a.name).join(", ")}
@@ -104,12 +104,12 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
                     <p className="text-gray-300 text-sm mt-1">
                       Status:{" "}
                       <Badge
-                        variant={
-                          manga.status.toLowerCase() === "ongoing"
-                            ? "default"
-                            : manga.status.toLowerCase() === "completed"
-                              ? "secondary"
-                              : "destructive"
+                        className={
+                          manga.status.toLowerCase() === "completed"
+                            ? "bg-green-900 text-green-300"
+                            : manga.status.toLowerCase() === "cancelled"
+                              ? "bg-red-950 text-red-300"
+                              : ""
                         }
                       >
                         {statusLabel}
@@ -128,7 +128,7 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
                 <Badge
                   key={tag.id}
                   variant="outline"
-                  className="text-xs p-2 bg-[#2a2a2a] border-[#444] text-gray-300"
+                  className="text-xs p-2 bg-[#2a2a2a] border-[#444] text-gray-300 cursor-default"
                 >
                   {tag.name}
                 </Badge>
