@@ -66,18 +66,15 @@ export default function HomePage() {
     router.replace(searchParams ? `/?${searchParams}` : "/", { scroll: false });
   };
 
-  const handleSubmit = useCallback(
-    (e: FormEvent) => {
-      e.preventDefault();
-      const submittedSearch = searchInput.trim();
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const submittedSearch = searchInput.trim();
 
-      setPage(1);
-      setSearch(submittedSearch); // valeur "committed" après submit
-      updateURL(submittedSearch, 1);
-      mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-    },
-    [searchInput, updateURL],
-  );
+    setPage(1);
+    setSearch(submittedSearch); // valeur "committed" après submit
+    updateURL(submittedSearch, 1);
+    mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const onChangeValue = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,7 +114,7 @@ export default function HomePage() {
           }}
         />
 
-        <div className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+        <div className="relative max-w-7xl mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-4 tracking-tight">
               <span className="text-balance">Discover Your Next</span>
@@ -140,10 +137,7 @@ export default function HomePage() {
                 value={searchInput}
                 onChange={onChangeValue}
               />
-              <Button
-                type="submit"
-                className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-              >
+              <Button type="submit" size="lg">
                 Search
               </Button>
             </form>

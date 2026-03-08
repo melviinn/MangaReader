@@ -25,13 +25,13 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
     : null;
 
   return (
-    <div className="bg-card w-full max-w-3xl mx-auto rounded-lg border p-4 md:p-6 shadow-md space-y-6">
+    <div className="bg-card w-full max-w-5xl mx-auto px-4 rounded-lg border p-4 md:p-6 shadow-md space-y-6">
       {/* Header: Infos à gauche, cover à droite */}
       <div className="flex flex-col md:flex-row gap-4">
         {/* Infos à gauche */}
         <div className="flex-1 flex flex-col gap-1 items-center">
-          <div className="flex flex-wrap items-baseline text-center gap-2 border rounded-xl px-2 md:px-6 py-2 bg-muted/50">
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight">
+          <div className="flex flex-wrap items-baseline text-center gap-2 border rounded-xl px-2 md:px-6 py-2 bg-primary">
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-primary-foreground">
               {mangaTitle}
             </h1>
             {/* {manga.year && (
@@ -84,24 +84,25 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
             <div className="text-gray-200">{manga.description}</div>
           )}
 
-		  {/* Change to shadcn Table */}
+          {/* Change to shadcn Table */}
           <table>
             <tbody>
               <tr>
                 <td className="pr-4">
                   {manga.authors.length > 0 && (
                     <p className="text-gray-300 text-sm mt-1">
+                      Auteur{manga.authors.length > 1 ? "s" : ""}:
                       <strong>
-                        Auteur{manga.authors.length > 1 ? "s" : ""}:
-                      </strong>{" "}
-                      {manga.authors.map((a) => a.name).join(", ")}
+                        {" "}
+                        {manga.authors.map((a) => a.name).join(", ")}
+                      </strong>
                     </p>
                   )}
                 </td>
                 <td>
                   {manga.status && (
                     <p className="text-gray-300 text-sm mt-1">
-                      <strong>Status:</strong>{" "}
+                      Status:{" "}
                       <Badge
                         variant={
                           manga.status.toLowerCase() === "ongoing"
@@ -124,7 +125,11 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
           {manga.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {manga.tags.map((tag) => (
-                <Badge key={tag.id} variant="outline" className="text-xs p-2">
+                <Badge
+                  key={tag.id}
+                  variant="outline"
+                  className="text-xs p-2 bg-[#2a2a2a] border-[#444] text-gray-300"
+                >
                   {tag.name}
                 </Badge>
               ))}

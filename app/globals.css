@@ -89,7 +89,7 @@
   --muted-foreground: oklch(0.68 0.036 295.353);
   --popover: oklch(0.117 0.018 295.75);
   --popover-foreground: oklch(0.981 0.004 296.252);
-  --card: oklch(0.13 0.021 294.974);
+  --card: #242424;
   --card-foreground: oklch(0.991 0.002 296.292);
   --border: oklch(0.278 0.03 256.848);
   --input: oklch(0.278 0.03 256.848);

@@ -24,9 +24,9 @@ export const ChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 p-4">
           {chapters.map((chapter) => {
             const date = chapter.publishedAt
-              ? new Date(chapter.publishedAt).toLocaleDateString("fr-FR", {
+              ? new Date(chapter.publishedAt).toLocaleDateString("en-EN", {
                   day: "2-digit",
-                  month: "long",
+                  month: "short",
                   year: "numeric",
                 })
               : null;
@@ -40,7 +40,7 @@ export const ChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
                 rounded-md border bg-muted/40 hover:bg-accent"
               >
                 <span className="font-medium text-foreground text-sm leading-tight">
-                  Chapitre {chapter.chapter ?? "?"}
+                  Chapter {chapter.chapter ?? "?"}
                 </span>
                 {date && (
                   <span className="text-xs text-muted-foreground/80">

@@ -130,6 +130,9 @@ function ChaptersListContent() {
 
   const firstChapterNumber = chapters[0]?.chapter;
   const lastChapterNumber = chapters[chapters.length - 1]?.chapter;
+  const haveChapters = chapters.length > 0;
+
+  const chapterTitle = chapters.length;
 
   return (
     <main className="w-full px-6 md:px-0 py-8 space-y-4">
@@ -139,20 +142,29 @@ function ChaptersListContent() {
         language={language}
       />
 
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto py-10">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold tracking-tight">
-            Available chapters:{" "}
-            <span className="ml-2">
-              {firstChapterNumber ?? "?"} - {lastChapterNumber ?? "?"}
-            </span>
-          </h1>
+          <h2 className="text-xl font-semibold tracking-tight">
+            {haveChapters ? (
+              <>
+                Available chapters:{" "}
+                <span className="text-primary"> {chapters.length}</span>
+                <span className="text-muted-foreground font-normal text-base ml-2">
+                  ({firstChapterNumber} - {lastChapterNumber})
+                </span>
+              </>
+            ) : (
+              "No chapters available"
+            )}
+          </h2>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                {currentLanguage?.flag || "🌐"}
-              </Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" size="icon">
+                  {currentLanguage?.flag || "🌐"}
+                </Button>
+              }
+            ></DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="space-y-1">
               {LANGUAGES.map((lang) => (
                 <DropdownMenuItem
