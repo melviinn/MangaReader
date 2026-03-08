@@ -63,7 +63,7 @@ export const ChapterView = () => {
 
   const currentChapter = chapters.find((ch: any) => ch.id === chapterId);
   const currentChapterName =
-    currentChapter?.title || `Chapitre ${currentChapter?.chapter || "inconnu"}`;
+    currentChapter?.title || `Chapter ${currentChapter?.chapter || "unknown"}`;
 
   const currentChapterNumber =
     currentChapterIndex !== -1 ? chapters[currentChapterIndex].chapter : null;
@@ -86,12 +86,12 @@ export const ChapterView = () => {
   };
 
   if (isLoading)
-    return <p className="text-center py-8">Chargement du chapitre...</p>;
+    return <p className="text-center py-8">Loading chapter...</p>;
 
   if (isError)
     return (
       <p className="text-center py-8 text-red-500">
-        Erreur lors du chargement du chapitre.
+        Failed to load chapter. Please try again later.
       </p>
     );
   if (!data) return null;
@@ -129,7 +129,7 @@ export const ChapterView = () => {
             {canShowButtons
               ? `${currentChapterNumber} / ${lastChapterNumber}`
               : chaptersLoading
-                ? "Chargement..."
+                ? "Loading..."
                 : ""}
           </span>
           <Button
@@ -144,7 +144,7 @@ export const ChapterView = () => {
         </div>
         {images.length === 0 ? (
           <p className="text-center py-8 text-gray-500">
-            Aucune page disponible pour ce chapitre.
+            No pages found for this chapter.
           </p>
         ) : (
           <div className="space-y-4">

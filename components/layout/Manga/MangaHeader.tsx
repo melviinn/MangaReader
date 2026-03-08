@@ -34,40 +34,11 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
             <h1 className="text-xl md:text-2xl font-bold tracking-tight text-primary-foreground">
               {mangaTitle}
             </h1>
-            {/* {manga.year && (
-              <span className="text-sm text-gray-400">({manga.year})</span>
-            )} */}
           </div>
-
-          {/* <div>
-            {manga.authors.length > 0 && (
-              <p className="text-gray-300 text-sm mt-1">
-                <strong>Auteur{manga.authors.length > 1 ? "s" : ""}:</strong>{" "}
-                {manga.authors.map((a) => a.name).join(", ")}
-              </p>
-            )}
-            {manga.status && (
-              <p className="text-gray-300 text-sm mt-1">
-                <strong>Status:</strong>{" "}
-                <Badge
-                  variant={
-                    manga.status.toLowerCase() === "ongoing"
-                      ? "default"
-                      : manga.status.toLowerCase() === "completed"
-                        ? "secondary"
-                        : "destructive"
-                  }
-                >
-                  {statusLabel}
-                </Badge>
-              </p>
-            )}
-          </div> */}
         </div>
       </div>
 
       <div className="w-full flex flex-col md:flex-row gap-4 justify-center  items-start">
-        {/* Cover à droite */}
         {coverUrl && (
           <Image
             src={coverUrl}
@@ -78,13 +49,12 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
           />
         )}
 
-        {/* Description */}
         <div className="flex flex-col space-y-4 w-full">
           {manga.description && (
             <div className="text-gray-200">{manga.description}</div>
           )}
 
-          {/* Change to shadcn Table */}
+          {/* TODO: Change to shadcn Table */}
           <table>
             <tbody>
               <tr>
@@ -121,7 +91,6 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
             </tbody>
           </table>
 
-          {/* Tags */}
           {manga.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {manga.tags.map((tag) => (

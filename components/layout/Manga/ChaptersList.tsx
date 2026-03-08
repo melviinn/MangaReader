@@ -97,25 +97,25 @@ function ChaptersListContent() {
   const currentLanguage = LANGUAGES.find((lang) => lang.code === language);
 
   if (isLoading) {
-    return <p className="text-center py-8">Chargement des chapitres...</p>;
+    return <p className="text-center py-8">Loading chapters...</p>;
   }
 
   if (isError) {
     return (
       <p className="text-center py-8 text-red-500">
-        Erreur lors du chargement des chapitres.
+        Failed to load chapters. Please try again later.
       </p>
     );
   }
 
   if (!chapters) {
-    return <p className="text-center py-8">Aucun chapitre trouvé.</p>;
+    return <p className="text-center py-8">No chapters found.</p>;
   }
 
   if (!mangaDetails) {
     return (
       <p className="text-center py-8 text-red-500">
-        Impossible de charger le manga
+        Failed to load manga details. Please try again later.
       </p>
     );
   }
@@ -188,7 +188,7 @@ function ChaptersListContent() {
           />
         </div>
         {filteredChapters.length === 0 ? (
-          <p className="text-center text-gray-500">Aucun chapitre trouvé.</p>
+          <p className="text-center text-gray-500">No chapters found.</p>
         ) : (
           <ChaptersScrollArea chapters={filteredChapters} mangaId={mangaId} />
         )}

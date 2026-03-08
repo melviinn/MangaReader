@@ -7,7 +7,7 @@ type ErrorMessageProps = {
 };
 
 export function ErrorMessage({
-  message = "Une erreur est survenue.",
+  message = "An unexpected error occurred. Please try again later.",
 }: ErrorMessageProps) {
   return (
     <Card className="mt-12 border-destructive">
