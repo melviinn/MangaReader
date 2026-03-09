@@ -85,8 +85,7 @@ export const ChapterView = () => {
     router.push(`/manga/${mangaId}/${chapterId}`);
   };
 
-  if (isLoading)
-    return <p className="text-center py-8">Loading chapter...</p>;
+  if (isLoading) return <p className="text-center py-8">Loading chapter...</p>;
 
   if (isError)
     return (
@@ -99,7 +98,7 @@ export const ChapterView = () => {
   const images = data.data;
 
   return (
-    <main className="w-full px-6 mx:px-0 py-8">
+    <main className="w-full px-6 md:px-0 py-8">
       <Button
         variant="ghost"
         className="mb-8 md:mb-0"
@@ -110,7 +109,6 @@ export const ChapterView = () => {
       </Button>
       <div className="max-w-3xl mx-0 md:mx-auto space-y-4">
         <div className="flex space-x-4 items-center mb-4">
-          {/* <h1 className="text-xl font-semibold">Lecture du chapitre: </h1> */}
           <h1 className="text-2xl font-semibold tracking-tighter">
             {currentChapterName}
           </h1>

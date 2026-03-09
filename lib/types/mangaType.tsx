@@ -32,6 +32,7 @@ export type MangaDetailsType = {
   id: string;
   description: string | null;
   status: string | null;
+  title: string;
   year: number | null;
   contentRating: string | null;
   tags: { id: string; name: string }[];

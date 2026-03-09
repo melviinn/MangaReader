@@ -11,7 +11,7 @@ import {
 import type { MangaChapterType, MangaDetailsType } from "@/lib/types/mangaType";
 import { FlagEN, FlagFR, FlagJA } from "@/public/flags";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChaptersScrollArea } from "./ChaptersScrollArea";
 import { MangaHeader } from "./MangaHeader";
@@ -54,11 +54,10 @@ const LANGUAGES = [
 
 function ChaptersListContent() {
   const params = useParams();
-  const searchParams = useSearchParams();
   const mangaId = params.id as string;
   const [search, setSearch] = useState("");
   const [language, setLanguage] = useState("en");
-  const mangaTitle = searchParams.get("title");
+
 
   // Charger la langue depuis localStorage au montage
   useEffect(() => {
@@ -75,7 +74,11 @@ function ChaptersListContent() {
   };
 
   // Get manga details for title and other info
-  const { data: mangaDetails } = useQuery<MangaDetailsType>({
+  const {
+    data: mangaDetails,
+    isLoading: mangaLoading,
+    isError: mangaError,
+  } = useQuery<MangaDetailsType>({
     queryKey: ["mangaDetails", mangaId, language],
     queryFn: () => fetchMangaDetails(mangaId, language),
     enabled: !!mangaId,
@@ -96,7 +99,7 @@ function ChaptersListContent() {
 
   const currentLanguage = LANGUAGES.find((lang) => lang.code === language);
 
-  if (isLoading) {
+  if (isLoading || mangaLoading) {
     return <p className="text-center py-8">Loading chapters...</p>;
   }
 
@@ -112,7 +115,7 @@ function ChaptersListContent() {
     return <p className="text-center py-8">No chapters found.</p>;
   }
 
-  if (!mangaDetails) {
+  if (mangaError || !mangaDetails) {
     return (
       <p className="text-center py-8 text-red-500">
         Failed to load manga details. Please try again later.
@@ -132,13 +135,13 @@ function ChaptersListContent() {
   const lastChapterNumber = chapters[chapters.length - 1]?.chapter;
   const haveChapters = chapters.length > 0;
 
-  const chapterTitle = chapters.length;
+  const chapterTitle = mangaDetails.title;
 
   return (
     <main className="w-full px-6 md:px-0 py-8 space-y-4">
       <MangaHeader
         manga={mangaDetails}
-        mangaTitle={mangaTitle || ""}
+        mangaTitle={chapterTitle}
         language={language}
       />
 

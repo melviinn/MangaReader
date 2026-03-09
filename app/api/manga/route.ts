@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
       mangas,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return NextResponse.json(
       { error: "Failed to fetch manga data" },
       { status: 500 }

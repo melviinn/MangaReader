@@ -1,6 +1,6 @@
 import Providers from "@/lib/providers";
 import { Outfit } from "next/font/google";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
 
@@ -11,9 +11,19 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Manga Reader",
-  description: "A simple manga reader",
-
+  title: {
+    default: "MangaReader",
+    template: "MangaReader | %s",
+  },
+  description: "Read your favorite manga online for free. Powered by MangaDex.",
+  keywords: ["manga", "manga reader", "read manga online", "mangadex"],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "MangaReader",
+    title: "MangaReader",
+    description: "Read your favorite manga online for free. Powered by MangaDex.",
+  },
 };
 
 export default function RootLayout({

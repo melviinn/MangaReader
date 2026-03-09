@@ -1,5 +1,16 @@
 import { NextResponse } from "next/server";
 
+type LocalizedString = Record<string, string>;
+
+function pickLocalized(
+  value: LocalizedString | undefined,
+  language: string,
+  fallback = "",
+): string {
+  if (!value) return fallback;
+  return value[language] ?? value.en ?? Object.values(value)[0] ?? fallback;
+}
+
 export async function GET(
   req: Request,
   props: { params: Promise<{ id: string }> },
@@ -16,44 +27,60 @@ export async function GET(
     url.searchParams.append("includes[]", "author");
     url.searchParams.append("includes[]", "artist");
     url.searchParams.append("includes[]", "cover_art");
+    url.searchParams.append("includes[]", "tag");
 
     const res = await fetch(url.toString(), {
       headers: { "Content-Type": "application/json" },
       next: { revalidate: 3600 },
     });
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch manga");
+    const payload = await res.json();
+
+    if (!res.ok || payload?.result !== "ok" || !payload?.data) {
+      const errorMessage =
+        payload?.errors?.[0]?.detail ||
+        payload?.errors?.[0]?.title ||
+        "Failed to fetch manga";
+      return NextResponse.json(
+        { error: errorMessage },
+        { status: res.status || 500 },
+      );
     }
 
-    const data = await res.json();
-    const manga = data.data;
+    const manga = payload.data;
+    const attributes = manga.attributes ?? {};
+    const relationships = manga.relationships ?? [];
 
-    const attributes = manga.attributes;
+    const title =
+      pickLocalized(attributes.title, language) ||
+      pickLocalized(attributes.altTitles?.[0], language, "No title");
 
-    const authors = manga.relationships
-      .filter((rel: any) => rel.type === "author")
+    const description = pickLocalized(attributes.description, language, "");
+
+    const authors = relationships
+      .filter((rel: any) => rel.type === "author" || rel.type === "artist")
       .map((rel: any) => ({
         id: rel.id,
         name: rel.attributes?.name ?? "Unknown",
         role: rel.type,
       }));
 
-    const tags = attributes.tags.map((tag: any) => ({
+    const tags = (attributes.tags ?? []).map((tag: any) => ({
       id: tag.id,
-      name: tag.attributes.name[language] ?? tag.attributes.name.en ?? "",
+      name: pickLocalized(tag.attributes?.name, language, ""),
     }));
+
+    const coverArt =
+      relationships.find((rel: any) => rel.type === "cover_art") ?? null;
 
     return NextResponse.json({
       id: manga.id,
-      description:
-        attributes.description[language] ?? attributes.description.en ?? "",
-      status: attributes.status,
-      year: attributes.year,
-      contentRating: attributes.contentRating,
-      coverArt: manga.relationships.find(
-        (rel: any) => rel.type === "cover_art",
-      ),
+      title,
+      description,
+      status: attributes.status ?? null,
+      year: attributes.year ?? null,
+      contentRating: attributes.contentRating ?? null,
+      coverArt,
       tags,
       authors,
     });

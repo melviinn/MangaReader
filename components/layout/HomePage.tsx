@@ -1,18 +1,18 @@
 "use client";
 
 // Essential imports
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, useCallback, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 // Components
 import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "../ErrorMessage";
 import { MangasSkeleton } from "../MangasSkeleton";
 import { MangasView } from "../MangasView";
 import { MangaPagination } from "../Pagination";
+import { SearchInput } from "../SearchInput";
 // Types
 import type { MangaResponseType } from "@/lib/types/mangaType";
-import { SearchInput } from "../SearchInput";
 
 async function fetchMangas(
   search: string,
@@ -37,19 +37,25 @@ async function fetchMangas(
 export default function HomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const search = searchParams.get("search") || "";
+  const page = Number(searchParams.get("page")) || 1;
   const mangasSectionRef = useRef<HTMLDivElement>(null);
 
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [searchInput, setSearchInput] = useState(
-    searchParams.get("search") || "",
-  );
-  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  const [searchInput, setSearchInput] = useState(search);
 
-  const { data, isLoading, isError } = useQuery<MangaResponseType, Error>({
+  const { data, isLoading, isError, isFetching } = useQuery<
+    MangaResponseType,
+    Error
+  >({
     queryKey: ["mangas", search, page],
     queryFn: () => fetchMangas(search, page),
     staleTime: 1000 * 60,
+    placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
 
   const updateURL = (newSearch: string, newPage: number) => {
     const params = new URLSearchParams();
@@ -62,45 +68,33 @@ export default function HomePage() {
       params.set("page", String(newPage));
     }
 
-    const searchParams = params.toString();
-    router.replace(searchParams ? `/?${searchParams}` : "/", { scroll: false });
+    router.replace(`/?${params.toString()}`, { scroll: false });
   };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const submittedSearch = searchInput.trim();
 
-    setPage(1);
-    setSearch(submittedSearch); // valeur "committed" après submit
     updateURL(submittedSearch, 1);
-    mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    // mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const onChangeValue = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setSearchInput(value);
+  const onChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
 
-      if (value.trim() === "") {
-        setPage(1);
-        setSearch("");
-        updateURL("", 1);
-      }
-    },
-    [updateURL],
-  );
+    if (value.trim() === "") {
+      updateURL("", 1);
+    }
+  };
 
-  const handlePageChange = useCallback(
-    (newPage: number | ((p: number) => number)) => {
-      // If newPage is a function, call it with the current page to get the new page number
-      const resolvedPage =
-        typeof newPage === "function" ? newPage(page) : newPage;
-      setPage(resolvedPage);
-      updateURL(search, resolvedPage);
-      mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-    },
-    [search, page, updateURL],
-  );
+  const handlePageChange = (newPage: number | ((p: number) => number)) => {
+    // If newPage is a function, call it with the current page to get the new page number
+    const resolvedPage =
+      typeof newPage === "function" ? newPage(page) : newPage;
+    updateURL(search, resolvedPage);
+    mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <main className="flex flex-col">
@@ -165,7 +159,9 @@ export default function HomePage() {
 
       <section ref={mangasSectionRef} className="py-12">
         <div className="max-w-7xl mx-auto px-4">
-          {isLoading && <MangasSkeleton />}
+          {/* {isLoading && <MangasSkeleton />} */}
+
+          {isFetching && <MangasSkeleton />}
 
           {isError && (
             <ErrorMessage message="Erreur lors du chargement des mangas." />

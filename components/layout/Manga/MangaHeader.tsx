@@ -15,10 +15,11 @@ const STATUS_LABELS: Record<string, Record<string, string>> = {
 };
 
 export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
-  if (!manga || !manga.status) return null;
+  if (!manga) return null;
 
-  const statusLabel =
-    STATUS_LABELS[language]?.[manga.status.toLowerCase()] ?? manga.status;
+  const statusLabel = manga.status
+    ? (STATUS_LABELS[language]?.[manga.status.toLowerCase()] ?? manga.status)
+    : null;
 
   const coverUrl = manga.coverArt?.attributes?.fileName
     ? `https://uploads.mangadex.org/covers/${manga.id}/${manga.coverArt.attributes.fileName}`

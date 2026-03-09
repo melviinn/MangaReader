@@ -26,19 +26,19 @@ const Navbar = () => {
         <nav className="flex items-center gap-6">
           <Link
             href="/"
-            className="text-sm font-semibold hover:underline underline-offset-4 text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+            className="text-sm font-semibold hover:underline underline-offset-4 text-primary-foreground"
           >
             Home
           </Link>
           <Button
             variant="link"
-            className="text-sm p-0 font-semibold text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+            className="text-sm p-0 font-semibold text-primary-foreground"
           >
             Popular
           </Button>
           <Button
             variant="link"
-            className="text-sm p-0 font-semibold text-primary-foreground/80 hover:text-primary-foreground transition-colors"
+            className="text-sm p-0 font-semibold text-primary-foreground"
           >
             Latest
           </Button>
