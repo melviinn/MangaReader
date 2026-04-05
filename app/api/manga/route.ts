@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch manga data...");
+      throw new Error("An unexpected error occurred, please try again later.");
     }
 
     const data = await response.json();
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         status: manga.attributes.status,
         year: manga.attributes.year,
         coverUrl: coverArt
-          ? `https://uploads.mangadex.org/covers/${manga.id}/${coverArt.attributes.fileName}.256.jpg`
+          ? `${process.env.API_COVER_URL}/${manga.id}/${coverArt.attributes.fileName}.256.jpg`
           : null,
       };
     });
