@@ -17,12 +17,14 @@ import type { MangaResponseType } from "@/lib/types/mangaType";
 async function fetchMangas(
   search: string,
   page: number,
+  language: string,
 ): Promise<MangaResponseType> {
   const limit = 24;
   const offset = (page - 1) * limit;
   const params = new URLSearchParams({
     limit: String(limit),
     offset: String(offset),
+    language,
   });
   if (search.trim() !== "") {
     params.append("title", search);
@@ -39,6 +41,7 @@ export default function HomePage() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
   const page = Number(searchParams.get("page")) || 1;
+  const language = searchParams.get("language") || "en";
   const mangasSectionRef = useRef<HTMLDivElement>(null);
 
   const [searchInput, setSearchInput] = useState(search);
@@ -47,8 +50,8 @@ export default function HomePage() {
     MangaResponseType,
     Error
   >({
-    queryKey: ["mangas", search, page],
-    queryFn: () => fetchMangas(search, page),
+    queryKey: ["mangas", search, page, language],
+    queryFn: () => fetchMangas(search, page, language),
     staleTime: 1000 * 60,
     placeholderData: keepPreviousData,
   });
@@ -61,6 +64,9 @@ export default function HomePage() {
     const params = new URLSearchParams();
     if (newSearch.trim()) {
       params.set("search", newSearch);
+    }
+    if (language !== "en") {
+      params.set("language", language);
     }
 
     // Reset page to 1 if search changes, otherwise keep the current page
@@ -120,7 +126,6 @@ export default function HomePage() {
               adventure and start reading today.
             </p>
 
-            {/* Search Form */}
             <form
               className="flex w-full max-w-xl items-center gap-3"
               onSubmit={handleSubmit}
@@ -136,7 +141,6 @@ export default function HomePage() {
               </Button>
             </form>
 
-            {/* Stats */}
             <div className="flex items-center gap-8 mt-10 text-sm">
               <div className="flex flex-col items-center">
                 <span className="text-2xl font-bold text-primary">10K+</span>
@@ -159,8 +163,6 @@ export default function HomePage() {
 
       <section ref={mangasSectionRef} className="py-12">
         <div className="max-w-7xl mx-auto px-4">
-          {/* {isLoading && <MangasSkeleton />} */}
-
           {isFetching && <MangasSkeleton />}
 
           {isError && (

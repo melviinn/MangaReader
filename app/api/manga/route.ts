@@ -4,6 +4,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
   const title = searchParams.get("title") || "";
+  const language = searchParams.get("language") || "en";
   const limit = Number(searchParams.get("limit") || "24");
   const offset = Number(searchParams.get("offset") || "0");
 
@@ -18,9 +19,13 @@ export async function GET(request: NextRequest) {
     url.searchParams.append("limit", limit.toString());
     url.searchParams.append("offset", offset.toString());
     url.searchParams.append("originalLanguage[]", "ja");
-    url.searchParams.append("publicationDemographic[]", "shounen");
+    url.searchParams.append("availableTranslatedLanguage[]", language);
+    url.searchParams.append("hasAvailableChapters", "true");
+    url.searchParams.append("hasUnavailableChapters", "false");
+
+    // url.searchParams.append("publicationDemographic[]", "shounen");
     url.searchParams.append("contentRating[]", "safe"); // No hentai
-    url.searchParams.append("contentRating[]", "suggestive"); // No hentai
+    // url.searchParams.append("contentRating[]", "suggestive"); // No hentai
 
     url.searchParams.append("includes[]", "cover_art");
     url.searchParams.append("order[followedCount]", "desc");
@@ -42,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     const mangas = data.data.map((manga: any) => {
       const coverArt = manga.relationships.find(
-        (rel: any) => rel.type === "cover_art"
+        (rel: any) => rel.type === "cover_art",
       );
 
       return {
@@ -70,7 +75,7 @@ export async function GET(request: NextRequest) {
     console.error(error);
     return NextResponse.json(
       { error: "Failed to fetch manga data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

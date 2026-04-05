@@ -14,6 +14,10 @@ export async function GET(
 
     const url = new URL(`${process.env.BASE_API_URL}/manga/${id}/feed`);
     url.searchParams.append("translatedLanguage[]", language);
+    url.searchParams.append("includeUnavailable", "0");
+    url.searchParams.append("includeEmptyPages", "0");
+    url.searchParams.append("includeExternalUrl", "0");
+    url.searchParams.append("includeFuturePublishAt", "0");
     url.searchParams.append("order[chapter]", "asc");
     url.searchParams.append("limit", "500");
 
@@ -28,15 +32,24 @@ export async function GET(
 
     const data = await res.json();
 
-    const chapters = data.data.map((chapter: any) => ({
-      id: chapter.id,
-      title: chapter.attributes.title,
-      chapter: chapter.attributes.chapter,
-      volume: chapter.attributes.volume,
-      pages: chapter.attributes.pages,
-      publishedAt:
-        chapter.attributes.publishAt || chapter.attributes.createdAt || null,
-    }));
+    const chapters = (data.data ?? [])
+      .filter((chapter: any) => {
+        const attributes = chapter?.attributes ?? {};
+        return (
+          !attributes.isUnavailable &&
+          !attributes.externalUrl &&
+          Number(attributes.pages ?? 0) > 0
+        );
+      })
+      .map((chapter: any) => ({
+        id: chapter.id,
+        title: chapter.attributes.title,
+        chapter: chapter.attributes.chapter,
+        volume: chapter.attributes.volume,
+        pages: chapter.attributes.pages,
+        publishedAt:
+          chapter.attributes.publishAt || chapter.attributes.createdAt || null,
+      }));
 
     return NextResponse.json({ chapters });
   } catch (error) {
