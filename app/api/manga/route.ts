@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { mangaDexHeaders } from "@/lib/mangadex";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -15,7 +16,6 @@ export async function GET(request: NextRequest) {
       url.searchParams.append("title", title);
     }
 
-    //TODO: Need to only get the main-streams mangas
     url.searchParams.append("limit", limit.toString());
     url.searchParams.append("offset", offset.toString());
     url.searchParams.append("originalLanguage[]", "ja");
@@ -32,9 +32,7 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(url.toString(), {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: mangaDexHeaders({ "Content-Type": "application/json" }),
 
       next: { revalidate: 3600 },
     });
@@ -49,6 +47,9 @@ export async function GET(request: NextRequest) {
       const coverArt = manga.relationships.find(
         (rel: any) => rel.type === "cover_art",
       );
+      const coverFileName = coverArt?.attributes?.fileName
+        ? `${coverArt.attributes.fileName}.256.jpg`
+        : null;
 
       return {
         id: manga.id,
@@ -59,8 +60,8 @@ export async function GET(request: NextRequest) {
           manga.attributes.description["en"] || "No description available",
         status: manga.attributes.status,
         year: manga.attributes.year,
-        coverUrl: coverArt
-          ? `${process.env.API_COVER_URL}/${manga.id}/${coverArt.attributes.fileName}.256.jpg`
+        coverUrl: coverFileName
+          ? `/api/manga/cover/${manga.id}/${encodeURIComponent(coverFileName)}`
           : null,
       };
     });

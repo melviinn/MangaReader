@@ -22,7 +22,7 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
     : null;
 
   const coverUrl = manga.coverArt?.attributes?.fileName
-    ? `https://uploads.mangadex.org/covers/${manga.id}/${manga.coverArt.attributes.fileName}`
+    ? `/api/manga/cover/${manga.id}/${encodeURIComponent(manga.coverArt.attributes.fileName)}`
     : null;
 
   return (

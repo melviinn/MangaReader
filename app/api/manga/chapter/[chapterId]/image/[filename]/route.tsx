@@ -1,9 +1,10 @@
 // app/api/manga/chapter/[chapterId]/image/[filename]/route.ts
+import { mangaDexHeaders } from "@/lib/mangadex";
 import { NextResponse } from "next/server";
 
 export async function GET(
   _req: Request,
-  props: { params: Promise<{ chapterId: string; filename: string }> }
+  props: { params: Promise<{ chapterId: string; filename: string }> },
 ) {
   try {
     // 1️⃣ Récupérer les params depuis la Promise
@@ -11,7 +12,8 @@ export async function GET(
 
     // 2️⃣ Récupérer les metadata du chapitre depuis MangaDex
     const chapterRes = await fetch(
-      `${process.env.BASE_API_URL}/at-home/server/${chapterId}`
+      `${process.env.BASE_API_URL}/at-home/server/${chapterId}`,
+      { headers: mangaDexHeaders() },
     );
     if (!chapterRes.ok) throw new Error("Failed to fetch chapter metadata");
     const chapterData = await chapterRes.json();
@@ -26,7 +28,7 @@ export async function GET(
     const url = `${chapterData.baseUrl}/data/${chapterData.chapter.hash}/${filename}`;
 
     // 4️⃣ Fetch l'image depuis MangaDex (proxy)
-    const imageRes = await fetch(url);
+    const imageRes = await fetch(url, { headers: mangaDexHeaders() });
     if (!imageRes.ok) throw new Error("Failed to fetch image");
 
     // 5️⃣ Lire le contenu et renvoyer au client

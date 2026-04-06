@@ -13,6 +13,8 @@ import { MangaPagination } from "../Pagination";
 import { SearchInput } from "../SearchInput";
 // Types
 import type { MangaResponseType } from "@/lib/types/mangaType";
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 async function fetchMangas(
   search: string,
@@ -42,7 +44,7 @@ export default function HomePage() {
   const search = searchParams.get("search") || "";
   const page = Number(searchParams.get("page")) || 1;
   const language = searchParams.get("language") || "en";
-  const mangasSectionRef = useRef<HTMLDivElement>(null);
+  const headerSectionRef = useRef<HTMLDivElement>(null);
 
   const [searchInput, setSearchInput] = useState(search);
 
@@ -69,7 +71,6 @@ export default function HomePage() {
       params.set("language", language);
     }
 
-    // Reset page to 1 if search changes, otherwise keep the current page
     if (newPage > 1) {
       params.set("page", String(newPage));
     }
@@ -82,7 +83,7 @@ export default function HomePage() {
     const submittedSearch = searchInput.trim();
 
     updateURL(submittedSearch, 1);
-    // mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    headerSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const onChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,12 +100,15 @@ export default function HomePage() {
     const resolvedPage =
       typeof newPage === "function" ? newPage(page) : newPage;
     updateURL(search, resolvedPage);
-    mangasSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    headerSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <main className="flex flex-col">
-      <section className="relative bg-background overflow-hidden">
+      <section
+        className="relative bg-background overflow-hidden"
+        ref={headerSectionRef}
+      >
         {/* Subtle dot pattern background */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -161,7 +165,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section ref={mangasSectionRef} className="py-12">
+      <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
           {isFetching && <MangasSkeleton />}
 
@@ -171,10 +175,20 @@ export default function HomePage() {
 
           {!isLoading && !isError && (
             <>
-              <div className="flex items-center mb-8">
+              <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-card-foreground">
                   {search ? `Results for "${search}"` : "Popular Manga"}
                 </h2>
+                <div>
+                  <Button size="lg">
+                    Filters
+                    <HugeiconsIcon
+                      icon={ArrowDown01Icon}
+                      className="ml-2"
+                      strokeWidth={2}
+                    />
+                  </Button>
+                </div>
               </div>
               <MangasView mangas={data?.mangas} />
             </>

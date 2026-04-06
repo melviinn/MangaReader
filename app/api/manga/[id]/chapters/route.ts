@@ -1,3 +1,4 @@
+import { mangaDexHeaders } from "@/lib/mangadex";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -22,7 +23,7 @@ export async function GET(
     url.searchParams.append("limit", "500");
 
     const res = await fetch(url.toString(), {
-      headers: { "Content-Type": "application/json" },
+      headers: mangaDexHeaders({ "Content-Type": "application/json" }),
       next: { revalidate: 3600 },
     });
 

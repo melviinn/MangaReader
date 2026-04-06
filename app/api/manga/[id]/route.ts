@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { mangaDexHeaders } from "@/lib/mangadex";
 
 type LocalizedString = Record<string, string>;
 
@@ -30,7 +31,7 @@ export async function GET(
     url.searchParams.append("includes[]", "tag");
 
     const res = await fetch(url.toString(), {
-      headers: { "Content-Type": "application/json" },
+      headers: mangaDexHeaders({ "Content-Type": "application/json" }),
       next: { revalidate: 3600 },
     });
 

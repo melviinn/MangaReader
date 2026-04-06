@@ -93,7 +93,6 @@
   --card-foreground: oklch(0.991 0.002 296.292);
   --border: oklch(0.278 0.03 256.848);
   --input: oklch(0.278 0.03 256.848);
-  /* --primary: oklch(0.513 0.264 281.703); */
   --primary: #e4ad4f;
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.199 0.006 295.741);

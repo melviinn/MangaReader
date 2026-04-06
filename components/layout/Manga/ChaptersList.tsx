@@ -152,9 +152,9 @@ function ChaptersListContent() {
               <>
                 Available chapters:{" "}
                 <span className="text-primary"> {chapters.length}</span>
-                <span className="text-muted-foreground font-normal text-base ml-2">
+                {/* <span className="text-muted-foreground font-normal text-base ml-2">
                   ({firstChapterNumber} - {lastChapterNumber})
-                </span>
+                </span> */}
               </>
             ) : (
               "No chapters available"
