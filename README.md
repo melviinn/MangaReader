@@ -124,9 +124,15 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 🙏 Acknowledgments
 
-- [MangaDex](https://mangadex.org/) for providing the API
-- [shadcn](https://twitter.com/shadcn) for the amazing UI components
-- [Vercel](https://vercel.com) for Next.js and hosting
+
+## 📌 MangaDex API Compliance
+
+This project follows MangaDex acceptable usage requirements:
+
+- MangaDex is credited in app metadata and visible UI.
+- Scanlation groups are credited on chapter reading pages when available.
+- The app is strictly non-commercial (no ads, no paid services).
+- If a scanlation group requests content removal, related content must be removed.
 
 ---
 

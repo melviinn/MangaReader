@@ -1,7 +1,8 @@
-import Providers from "@/lib/providers";
-import { Outfit } from "next/font/google";
-import type { Metadata } from "next";
+import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import Providers from "@/lib/providers";
+import type { Metadata } from "next";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -22,7 +23,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "MangaReader",
     title: "MangaReader",
-    description: "Read your favorite manga online for free. Powered by MangaDex.",
+    description:
+      "Read your favorite manga online for free. Powered by MangaDex.",
   },
 };
 
@@ -33,10 +35,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${outfit.variable} antialiased`}>
+      <body className={`${outfit.variable} antialiased min-h-dvh`}>
         <Providers>
-          <Navbar />
-          {children}
+          <div className="min-h-dvh flex flex-col">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
         </Providers>
       </body>
     </html>

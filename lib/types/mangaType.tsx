@@ -17,6 +17,7 @@ export type MangaChapterType = {
   chapter: string | null;
   volume: string | null;
   publishedAt?: string | null;
+  scanlationGroups?: { id: string; name: string }[];
 
   // pages: number;
 };
