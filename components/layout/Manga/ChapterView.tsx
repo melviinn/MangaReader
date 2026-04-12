@@ -98,18 +98,14 @@ export const ChapterView = () => {
   const images = data.data;
 
   return (
-    <main className="w-full px-6 md:px-0 py-8">
-      <Button
-        variant="ghost"
-        className="mb-8 md:mb-0"
-        onClick={() => router.push(`/manga/${mangaId}`)}
-      >
+    <main className="w-full px-6 py-8">
+      <Button className="mb-8" onClick={() => router.push(`/manga/${mangaId}`)}>
         <HugeiconsIcon icon={ArrowLeft01Icon} />
         Return to the chapters list
       </Button>
       <div className="max-w-3xl mx-0 md:mx-auto space-y-4">
-        <div className="flex space-x-4 items-center mb-4">
-          <h1 className="text-2xl font-semibold tracking-tighter">
+        <div className="flex space-x-4 items-center mb-4 justify-center">
+          <h1 className="text-2xl font-semibold tracking-tight">
             {currentChapterName}
           </h1>
         </div>

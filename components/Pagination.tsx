@@ -39,7 +39,6 @@ export function MangaPagination({
 
   return (
     <div className="flex items-center gap-2">
-      {/* Previous */}
       <Button
         variant="outline"
         size="icon"
@@ -49,7 +48,6 @@ export function MangaPagination({
         <HugeiconsIcon icon={ArrowLeft01Icon} />
       </Button>
 
-      {/* Pages */}
       {getPages().map((p) => (
         <Button
           key={p}
@@ -61,7 +59,6 @@ export function MangaPagination({
         </Button>
       ))}
 
-      {/* Next */}
       <Button
         variant="outline"
         size="icon"

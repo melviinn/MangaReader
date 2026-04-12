@@ -24,7 +24,7 @@ const MangasView = ({ mangas }: MangasViewProps) => {
         <Link
           href={`/manga/${manga.id}`}
           key={manga.id}
-          className="w-50 space-y-2 cursor-pointer hover:opacity-90 transition"
+          className="w-full min-w-0 space-y-2 cursor-pointer hover:opacity-90 transition-opacity duration-200"
         >
           <div className="relative aspect-2/3 w-full overflow-hidden rounded">
             {manga.coverUrl && (

@@ -1,17 +1,14 @@
 "use client";
 
-// Essential imports
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-// Components
 import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "../ErrorMessage";
 import { MangasSkeleton } from "../MangasSkeleton";
 import { MangasView } from "../MangasView";
 import { MangaPagination } from "../Pagination";
 import { SearchInput } from "../SearchInput";
-// Types
 import type { MangaResponseType } from "@/lib/types/mangaType";
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -96,7 +93,6 @@ export default function HomePage() {
   };
 
   const handlePageChange = (newPage: number | ((p: number) => number)) => {
-    // If newPage is a function, call it with the current page to get the new page number
     const resolvedPage =
       typeof newPage === "function" ? newPage(page) : newPage;
     updateURL(search, resolvedPage);
@@ -109,7 +105,6 @@ export default function HomePage() {
         className="relative bg-background overflow-hidden"
         ref={headerSectionRef}
       >
-        {/* Subtle dot pattern background */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{

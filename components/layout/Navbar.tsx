@@ -34,7 +34,7 @@ const Navbar = () => {
             <Link
               key={link.name}
               href={link.href}
-              className="hover:underline underline-offset-4 flex items-center gap-1"
+              className="relative flex items-center gap-1 pb-1 after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:rounded-full after:bg-primary-foreground after:transition-all after:duration-200 hover:after:w-full"
             >
               {link.icon}
               {link.name}
