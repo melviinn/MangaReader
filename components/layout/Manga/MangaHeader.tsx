@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import type { MangaDetailsType } from "@/lib/types/mangaType";
+import { formatMangaDescription } from "@/lib/utils";
 import Image from "next/image";
 
 interface MangaHeaderProps {
@@ -16,6 +17,8 @@ const STATUS_LABELS: Record<string, Record<string, string>> = {
 
 export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
   if (!manga) return null;
+
+  const safeDescription = formatMangaDescription(manga.description, 360);
 
   const statusLabel = manga.status
     ? (STATUS_LABELS[language]?.[manga.status.toLowerCase()] ?? manga.status)
@@ -51,9 +54,7 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
         )}
 
         <div className="flex flex-col space-y-4 w-full">
-          {manga.description && (
-            <div className="text-gray-200">{manga.description}</div>
-          )}
+          <div className="text-gray-200">{safeDescription}</div>
 
           {/* TODO: Change to shadcn Table */}
           <table>

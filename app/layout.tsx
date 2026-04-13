@@ -34,12 +34,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html
+      lang="en"
+      className="dark"
+      suppressHydrationWarning
+      suppressContentEditableWarning
+    >
       <body className={`${outfit.variable} antialiased min-h-dvh`}>
         <Providers>
           <div className="min-h-dvh flex flex-col">
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main className="flex flex-1 flex-col">{children}</main>
             <Footer />
           </div>
         </Providers>

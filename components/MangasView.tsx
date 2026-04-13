@@ -4,9 +4,10 @@ import Link from "next/link";
 
 type MangasViewProps = {
   mangas?: MangaType[];
+  layout?: "grid" | "compact";
 };
 
-const MangasView = ({ mangas }: MangasViewProps) => {
+const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
   if (!mangas?.length) {
     return (
       <div className="w-full flex flex-col items-center justify-center py-20">
@@ -19,14 +20,30 @@ const MangasView = ({ mangas }: MangasViewProps) => {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 w-full">
+    <div
+      className={
+        layout === "compact"
+          ? "grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 w-full"
+          : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6 w-full"
+      }
+    >
       {mangas?.map((manga) => (
         <Link
           href={`/manga/${manga.id}`}
           key={manga.id}
-          className="w-full min-w-0 space-y-2 cursor-pointer hover:opacity-90 transition-opacity duration-200"
+          className={
+            layout === "compact"
+              ? "flex items-center gap-3 rounded-lg border border-border/60 bg-card/30 p-2 hover:bg-card/50 transition-colors duration-200"
+              : "w-full min-w-0 space-y-2 cursor-pointer hover:opacity-90 transition-opacity duration-200"
+          }
         >
-          <div className="relative aspect-2/3 w-full overflow-hidden rounded">
+          <div
+            className={
+              layout === "compact"
+                ? "relative h-20 w-14 shrink-0 overflow-hidden rounded"
+                : "relative aspect-2/3 w-full overflow-hidden rounded"
+            }
+          >
             {manga.coverUrl && (
               <Image
                 src={manga.coverUrl}
@@ -38,7 +55,13 @@ const MangasView = ({ mangas }: MangasViewProps) => {
             )}
           </div>
 
-          <h2 className="text-sm font-medium leading-tight text-center">
+          <h2
+            className={
+              layout === "compact"
+                ? "text-sm font-medium leading-tight text-left line-clamp-2"
+                : "text-sm font-medium leading-tight text-center"
+            }
+          >
             {manga.title}
           </h2>
         </Link>

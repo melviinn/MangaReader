@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { mangaDexHeaders } from "@/lib/mangadex";
+import { SORT_ORDER_MAP, normalizeSortValue } from "@/lib/types/mangaSort";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -8,6 +9,7 @@ export async function GET(request: NextRequest) {
   const language = searchParams.get("language") || "en";
   const limit = Number(searchParams.get("limit") || "24");
   const offset = Number(searchParams.get("offset") || "0");
+  const sort = normalizeSortValue(searchParams.get("sort"));
 
   try {
     const url = new URL(`${process.env.BASE_API_URL}/manga`);
@@ -28,7 +30,10 @@ export async function GET(request: NextRequest) {
     // url.searchParams.append("contentRating[]", "suggestive"); // No hentai
 
     url.searchParams.append("includes[]", "cover_art");
-    url.searchParams.append("order[followedCount]", "desc");
+    url.searchParams.append(
+      `order[${SORT_ORDER_MAP[sort].field}]`,
+      SORT_ORDER_MAP[sort].direction,
+    );
 
     const response = await fetch(url.toString(), {
       method: "GET",

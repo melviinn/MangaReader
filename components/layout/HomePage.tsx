@@ -1,22 +1,32 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  DEFAULT_SORT,
+  normalizeSortValue,
+  type SortValue,
+} from "@/lib/types/mangaSort";
+import type { MangaResponseType } from "@/lib/types/mangaType";
+import {
+  GridViewIcon,
+  LeftToRightListBulletIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "../ErrorMessage";
 import { MangasSkeleton } from "../MangasSkeleton";
 import { MangasView } from "../MangasView";
 import { MangaPagination } from "../Pagination";
 import { SearchInput } from "../SearchInput";
-import type { MangaResponseType } from "@/lib/types/mangaType";
-import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { FiltersDropdown } from "../ui/filters-dropdown";
 
 async function fetchMangas(
   search: string,
   page: number,
   language: string,
+  sort: SortValue,
 ): Promise<MangaResponseType> {
   const limit = 24;
   const offset = (page - 1) * limit;
@@ -24,6 +34,7 @@ async function fetchMangas(
     limit: String(limit),
     offset: String(offset),
     language,
+    sort,
   });
   if (search.trim() !== "") {
     params.append("title", search);
@@ -41,16 +52,22 @@ export default function HomePage() {
   const search = searchParams.get("search") || "";
   const page = Number(searchParams.get("page")) || 1;
   const language = searchParams.get("language") || "en";
+  const sortMode = normalizeSortValue(searchParams.get("sort"));
+  const layoutFromURL =
+    searchParams.get("layout") === "compact" ? "compact" : "grid";
   const headerSectionRef = useRef<HTMLDivElement>(null);
 
   const [searchInput, setSearchInput] = useState(search);
+  const [layoutMode, setLayoutMode] = useState<"grid" | "compact">(
+    layoutFromURL,
+  );
 
   const { data, isLoading, isError, isFetching } = useQuery<
     MangaResponseType,
     Error
   >({
-    queryKey: ["mangas", search, page, language],
-    queryFn: () => fetchMangas(search, page, language),
+    queryKey: ["mangas", search, page, language, sortMode],
+    queryFn: () => fetchMangas(search, page, language, sortMode),
     staleTime: 1000 * 60,
     placeholderData: keepPreviousData,
   });
@@ -59,7 +76,16 @@ export default function HomePage() {
     setSearchInput(search);
   }, [search]);
 
-  const updateURL = (newSearch: string, newPage: number) => {
+  useEffect(() => {
+    setLayoutMode(layoutFromURL);
+  }, [layoutFromURL]);
+
+  const updateURL = (
+    newSearch: string,
+    newPage: number,
+    newLayout: "grid" | "compact" = layoutMode,
+    newSort: SortValue = sortMode,
+  ) => {
     const params = new URLSearchParams();
     if (newSearch.trim()) {
       params.set("search", newSearch);
@@ -70,6 +96,14 @@ export default function HomePage() {
 
     if (newPage > 1) {
       params.set("page", String(newPage));
+    }
+
+    if (newLayout !== "grid") {
+      params.set("layout", newLayout);
+    }
+
+    if (newSort !== DEFAULT_SORT) {
+      params.set("sort", newSort);
     }
 
     router.replace(`/?${params.toString()}`, { scroll: false });
@@ -97,6 +131,15 @@ export default function HomePage() {
       typeof newPage === "function" ? newPage(page) : newPage;
     updateURL(search, resolvedPage);
     headerSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleLayoutChange = (newLayout: "grid" | "compact") => {
+    setLayoutMode(newLayout);
+    updateURL(search, page, newLayout, sortMode);
+  };
+
+  const handleSortChange = (newSort: SortValue) => {
+    updateURL(search, 1, layoutMode, newSort);
   };
 
   return (
@@ -168,25 +211,39 @@ export default function HomePage() {
             <ErrorMessage message="Erreur lors du chargement des mangas." />
           )}
 
-          {!isLoading && !isError && (
-            <>
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-card-foreground">
+          <div className="flex items-end justify-between mb-8">
+            <div className="flex flex-col gap-2">
+              <p className="text-muted-foreground">Sort by</p>
+              <FiltersDropdown
+                value={sortMode}
+                onValueChange={handleSortChange}
+              />
+            </div>
+            {/* <h2 className="text-2xl font-bold text-card-foreground">
                   {search ? `Results for "${search}"` : "Popular Manga"}
-                </h2>
-                <div>
-                  <Button size="lg">
-                    Filters
-                    <HugeiconsIcon
-                      icon={ArrowDown01Icon}
-                      className="ml-2"
-                      strokeWidth={2}
-                    />
-                  </Button>
-                </div>
-              </div>
-              <MangasView mangas={data?.mangas} />
-            </>
+                </h2> */}
+            <div className="flex gap-2">
+              <Button
+                size="icon-lg"
+                variant={layoutMode === "compact" ? "default" : "outline"}
+                onClick={() => handleLayoutChange("compact")}
+                aria-label="Switch to compact layout"
+              >
+                <HugeiconsIcon icon={LeftToRightListBulletIcon} />
+              </Button>
+              <Button
+                size="icon-lg"
+                variant={layoutMode === "grid" ? "default" : "outline"}
+                onClick={() => handleLayoutChange("grid")}
+                aria-label="Switch to grid layout"
+              >
+                <HugeiconsIcon icon={GridViewIcon} />
+              </Button>
+            </div>
+          </div>
+
+          {!isLoading && !isError && (
+            <MangasView mangas={data?.mangas} layout={layoutMode} />
           )}
         </div>
       </section>

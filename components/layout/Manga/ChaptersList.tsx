@@ -58,7 +58,6 @@ function ChaptersListContent() {
   const [search, setSearch] = useState("");
   const [language, setLanguage] = useState("en");
 
-
   // Charger la langue depuis localStorage au montage
   useEffect(() => {
     const savedLanguage = localStorage.getItem(`manga_${mangaId}_language`);
@@ -145,7 +144,7 @@ function ChaptersListContent() {
         language={language}
       />
 
-      <div className="max-w-5xl mx-auto py-10">
+      <div className="max-w-7xl mx-auto py-10 px-2 md:px-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold tracking-tight">
             {haveChapters ? (
