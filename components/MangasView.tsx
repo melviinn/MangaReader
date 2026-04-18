@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { MangaType } from "@/lib/types/mangaType";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +9,9 @@ type MangasViewProps = {
 };
 
 const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
+  const formatLabel = (value: string) =>
+    value.charAt(0).toUpperCase() + value.slice(1);
+
   if (!mangas?.length) {
     return (
       <div className="w-full flex flex-col items-center justify-center py-20">
@@ -33,14 +37,14 @@ const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
           key={manga.id}
           className={
             layout === "compact"
-              ? "flex items-center gap-3 rounded-lg border border-border/60 bg-card/30 p-2 hover:bg-card/50 transition-colors duration-200"
+              ? "flex items-start gap-3 rounded-lg border border-border/60 bg-card/30 p-3 hover:bg-card/50 transition-colors duration-200"
               : "w-full min-w-0 space-y-2 cursor-pointer hover:opacity-90 transition-opacity duration-200"
           }
         >
           <div
             className={
               layout === "compact"
-                ? "relative h-20 w-14 shrink-0 overflow-hidden rounded"
+                ? "relative h-32 w-24 shrink-0 overflow-hidden rounded"
                 : "relative aspect-2/3 w-full overflow-hidden rounded"
             }
           >
@@ -49,21 +53,53 @@ const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
                 src={manga.coverUrl}
                 alt={manga.title}
                 fill
-                sizes="200px"
+                sizes="300px"
                 className="object-cover"
               />
             )}
           </div>
 
-          <h2
-            className={
-              layout === "compact"
-                ? "text-sm font-medium leading-tight text-left line-clamp-2"
-                : "text-sm font-medium leading-tight text-center"
-            }
-          >
-            {manga.title}
-          </h2>
+          {layout === "compact" ? (
+            <div className="min-w-0 flex-1 space-y-2">
+              <h2 className="text-sm font-semibold leading-tight text-left line-clamp-2">
+                {manga.title}
+              </h2>
+
+              <div className="flex flex-wrap gap-1.5">
+                {manga.status && (
+                  <Badge
+                    variant="outline"
+                    className={`text-xs ${manga.status === "ongoing" ? "bg-primary text-primary-foreground" : "bg-green-900 text-green-300"}`}
+                  >
+                    {formatLabel(manga.status)}
+                  </Badge>
+                )}
+                {manga.year && (
+                  <Badge variant="secondary" className="text-xs">
+                    {manga.year}
+                  </Badge>
+                )}
+                {manga.contentRating && (
+                  <Badge
+                    variant="ghost"
+                    className="text-xs pointer-events-none"
+                  >
+                    {formatLabel(manga.contentRating)}
+                  </Badge>
+                )}
+              </div>
+
+              {manga.description && (
+                <p className="text-xs text-muted-foreground line-clamp-4">
+                  {manga.description}
+                </p>
+              )}
+            </div>
+          ) : (
+            <h2 className="text-sm font-medium leading-tight text-center">
+              {manga.title}
+            </h2>
+          )}
         </Link>
       ))}
     </div>

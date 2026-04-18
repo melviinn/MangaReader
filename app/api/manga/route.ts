@@ -62,9 +62,13 @@ export async function GET(request: NextRequest) {
           manga.attributes.title["en"] ||
           Object.values(manga.attributes.title)[0],
         description:
-          manga.attributes.description["en"] || "No description available",
+          manga.attributes.description["en"] ||
+          Object.values(manga.attributes.description || {})[0] ||
+          "No description available",
         status: manga.attributes.status,
         year: manga.attributes.year,
+        contentRating: manga.attributes.contentRating,
+        publicationDemographic: manga.attributes.publicationDemographic,
         coverUrl: coverFileName
           ? `/api/manga/cover/${manga.id}/${encodeURIComponent(coverFileName)}`
           : null,

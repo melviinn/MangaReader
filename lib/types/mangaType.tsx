@@ -2,6 +2,11 @@ export type MangaType = {
   id: string;
   title: string;
   coverUrl: string | null;
+  description?: string | null;
+  status?: string | null;
+  year?: number | null;
+  contentRating?: string | null;
+  publicationDemographic?: string | null;
 };
 
 export type MangaResponseType = {
