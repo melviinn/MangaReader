@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { mangaDexHeaders } from "@/lib/mangadex";
+import { NextResponse } from "next/server";
 
 type LocalizedString = Record<string, string>;
 
@@ -74,6 +74,45 @@ export async function GET(
     const coverArt =
       relationships.find((rel: any) => rel.type === "cover_art") ?? null;
 
+    let ratingAverage: number | null = null;
+    let ratingBayesian: number | null = null;
+    let follows: number | null = null;
+
+    try {
+      const statsUrl = new URL(
+        `${process.env.BASE_API_URL}/statistics/manga/${id}`,
+      );
+      const statsRes = await fetch(statsUrl.toString(), {
+        headers: mangaDexHeaders({ "Content-Type": "application/json" }),
+        next: { revalidate: 3600 },
+      });
+
+      if (statsRes.ok) {
+        const statsPayload = await statsRes.json();
+        const statsData = statsPayload?.statistics ?? {};
+        const statsEntry = statsData?.[id] ?? statsData;
+
+        const average = statsEntry?.rating?.average;
+        const bayesian = statsEntry?.rating?.bayesian;
+        const followsCount = statsEntry?.follows;
+
+        ratingAverage =
+          typeof average === "number" && Number.isFinite(average)
+            ? average
+            : null;
+        ratingBayesian =
+          typeof bayesian === "number" && Number.isFinite(bayesian)
+            ? bayesian
+            : null;
+        follows =
+          typeof followsCount === "number" && Number.isFinite(followsCount)
+            ? followsCount
+            : null;
+      }
+    } catch {
+      // Do not fail manga details when statistics endpoint is unavailable.
+    }
+
     return NextResponse.json({
       id: manga.id,
       title,
@@ -81,6 +120,9 @@ export async function GET(
       status: attributes.status ?? null,
       year: attributes.year ?? null,
       contentRating: attributes.contentRating ?? null,
+      ratingAverage,
+      ratingBayesian,
+      follows,
       coverArt,
       tags,
       authors,

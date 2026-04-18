@@ -130,57 +130,66 @@ function ChaptersListContent() {
           chapter.title?.toLowerCase().includes(search.trim().toLowerCase()),
       );
 
-  const firstChapterNumber = chapters[0]?.chapter;
-  const lastChapterNumber = chapters[chapters.length - 1]?.chapter;
   const haveChapters = chapters.length > 0;
-
-  const chapterTitle = mangaDetails.title;
 
   return (
     <main className="w-full px-6 md:px-0 py-8 space-y-4">
       <MangaHeader
         manga={mangaDetails}
-        mangaTitle={chapterTitle}
+        mangaTitle={mangaDetails.title}
         language={language}
       />
 
       <div className="max-w-7xl mx-auto py-10 px-2 md:px-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold tracking-tight">
-            {haveChapters ? (
-              <>
-                Available chapters:{" "}
-                <span className="text-primary"> {chapters.length}</span>
-                {/* <span className="text-muted-foreground font-normal text-base ml-2">
-                  ({firstChapterNumber} - {lastChapterNumber})
-                </span> */}
-              </>
-            ) : (
-              "No chapters available"
-            )}
-          </h2>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="outline" size="icon">
-                  {currentLanguage?.flag || "🌐"}
-                </Button>
-              }
-            ></DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="space-y-1">
-              {LANGUAGES.map((lang) => (
-                <DropdownMenuItem
-                  key={lang.code}
-                  onClick={() => handleLanguageChange(lang.code)}
-                  className={language === lang.code ? "bg-accent" : ""}
-                >
-                  <span className="mr-2">{lang.flag}</span>
-                  {lang.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="mb-4 rounded-xl border border-border/60 bg-card/30 p-3 md:p-4">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 ">
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold leading-tight tracking-tight text-foreground sm:text-xl">
+                {haveChapters ? (
+                  <>
+                    Available chapters
+                    <span className="text-primary">: {chapters.length}</span>
+                  </>
+                ) : (
+                  "No chapters available"
+                )}
+              </h2>
+              {/* <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+                Language: {currentLanguage?.label ?? "Unknown"}
+              </p> */}
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    className="size-8 p-0 sm:h-9 sm:w-auto sm:gap-2 sm:px-2.5"
+                    aria-label={`Language: ${currentLanguage?.label || "Unknown"}`}
+                  >
+                    <span>{currentLanguage?.flag || "🌐"}</span>
+                    <span className="hidden sm:inline">
+                      {currentLanguage?.label || "Language"}
+                    </span>
+                  </Button>
+                }
+              ></DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="space-y-1">
+                {LANGUAGES.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    onClick={() => handleLanguageChange(lang.code)}
+                    className={language === lang.code ? "bg-accent" : ""}
+                  >
+                    <span className="mr-2">{lang.flag}</span>
+                    {lang.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
+
         <div className="flex justify-center mb-4 sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-4">
           <SearchInput
             type="text"

@@ -21,7 +21,7 @@ export const ChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
   return (
     <div className="w-full rounded-md border bg-background">
       <div className="max-h-96 overflow-y-auto scrollbar-thin">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 p-4">
+        <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 md:grid-cols-4">
           {chapters.map((chapter) => {
             const date = chapter.publishedAt
               ? new Date(chapter.publishedAt).toLocaleDateString("en-EN", {
@@ -31,21 +31,45 @@ export const ChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
                 })
               : null;
 
+            const chapterLabel = chapter.chapter
+              ? `Chapter ${chapter.chapter}`
+              : "Chapter ?";
+            const titleLabel = chapter.title?.trim() || "Untitled";
+            const pagesLabel =
+              typeof chapter.pages === "number"
+                ? `${chapter.pages} pages`
+                : null;
+
             return (
               <Button
                 key={chapter.id}
                 variant="secondary"
                 onClick={() => router.push(`/manga/${mangaId}/${chapter.id}`)}
-                className="h-auto group bg-card items-start justify-start flex flex-col gap-1 px-3 py-2 text-left
-                rounded-md border hover:border-primary/50 hover:bg-card/80 transition-all"
+                className="group flex h-auto w-full min-w-0 flex-col items-start justify-start gap-1 rounded-md border bg-card px-3 py-2 text-left transition-all hover:border-primary/50 hover:bg-card/80"
               >
-                <span className="font-medium text-foreground text-sm leading-tight group-hover:text-primary transition-colors">
-                  Chapter {chapter.chapter ?? "?"}
+                <span className="w-full truncate text-sm font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
+                  {chapterLabel}
                 </span>
-                {date && (
-                  <span className="text-xs text-muted-foreground/80">
-                    {date}
+
+                {titleLabel && (
+                  <span className="hidden w-full truncate text-xs text-muted-foreground sm:block">
+                    {titleLabel}
                   </span>
+                )}
+
+                {(date || pagesLabel) && (
+                  <div className="mt-auto flex w-full items-center justify-between gap-2">
+                    {date && (
+                      <span className="text-[11px] text-muted-foreground/80">
+                        {date}
+                      </span>
+                    )}
+                    {pagesLabel && (
+                      <span className="hidden text-[11px] text-muted-foreground/80 sm:inline">
+                        {pagesLabel}
+                      </span>
+                    )}
+                  </div>
                 )}
               </Button>
             );
