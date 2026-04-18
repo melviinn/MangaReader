@@ -8,25 +8,35 @@ import {
 } from "@/lib/types/mangaSort";
 import type { MangaResponseType } from "@/lib/types/mangaType";
 import {
+  ArrowDown01Icon,
+  ArrowUp01Icon,
+  FilterIcon,
   GridViewIcon,
   LeftToRightListBulletIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ErrorMessage } from "../ErrorMessage";
 import { MangasSkeleton } from "../MangasSkeleton";
 import { MangasView } from "../MangasView";
 import { MangaPagination } from "../Pagination";
 import { SearchInput } from "../SearchInput";
 import { FiltersDropdown } from "../ui/filters-dropdown";
+import {
+  TagsDropdown,
+  type TagFilterMode,
+  type TagsDropdownChange,
+} from "./TagsDropdown";
 
 async function fetchMangas(
   search: string,
   page: number,
   language: string,
   sort: SortValue,
+  tagIds: string[],
+  tagFilterMode: TagFilterMode,
 ): Promise<MangaResponseType> {
   const limit = 24;
   const offset = (page - 1) * limit;
@@ -38,6 +48,11 @@ async function fetchMangas(
   });
   if (search.trim() !== "") {
     params.append("title", search);
+  }
+
+  if (tagIds.length > 0) {
+    params.append("tagIds", tagIds.join(","));
+    params.append("tagMode", tagFilterMode);
   }
 
   const res = await fetch(`/api/manga?${params.toString()}`);
@@ -53,6 +68,12 @@ export default function HomePage() {
   const page = Number(searchParams.get("page")) || 1;
   const language = searchParams.get("language") || "en";
   const sortMode = normalizeSortValue(searchParams.get("sort"));
+  const selectedTagIds = (searchParams.get("tags") || "")
+    .split(",")
+    .map((tagId) => tagId.trim())
+    .filter(Boolean);
+  const tagFilterMode: TagFilterMode =
+    searchParams.get("tagMode") === "exclude" ? "exclude" : "include";
   const layoutFromURL =
     searchParams.get("layout") === "compact" ? "compact" : "grid";
   const headerSectionRef = useRef<HTMLDivElement>(null);
@@ -61,13 +82,30 @@ export default function HomePage() {
   const [layoutMode, setLayoutMode] = useState<"grid" | "compact">(
     layoutFromURL,
   );
+  const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
   const { data, isLoading, isError, isFetching } = useQuery<
     MangaResponseType,
     Error
   >({
-    queryKey: ["mangas", search, page, language, sortMode],
-    queryFn: () => fetchMangas(search, page, language, sortMode),
+    queryKey: [
+      "mangas",
+      search,
+      page,
+      language,
+      sortMode,
+      selectedTagIds,
+      tagFilterMode,
+    ],
+    queryFn: () =>
+      fetchMangas(
+        search,
+        page,
+        language,
+        sortMode,
+        selectedTagIds,
+        tagFilterMode,
+      ),
     staleTime: 1000 * 60,
     placeholderData: keepPreviousData,
   });
@@ -85,6 +123,8 @@ export default function HomePage() {
     newPage: number,
     newLayout: "grid" | "compact" = layoutMode,
     newSort: SortValue = sortMode,
+    newTagIds: string[] = selectedTagIds,
+    newTagFilterMode: TagFilterMode = tagFilterMode,
   ) => {
     const params = new URLSearchParams();
     if (newSearch.trim()) {
@@ -104,6 +144,14 @@ export default function HomePage() {
 
     if (newSort !== DEFAULT_SORT) {
       params.set("sort", newSort);
+    }
+
+    if (newTagIds.length > 0) {
+      params.set("tags", newTagIds.join(","));
+    }
+
+    if (newTagFilterMode !== "include") {
+      params.set("tagMode", newTagFilterMode);
     }
 
     router.replace(`/?${params.toString()}`, { scroll: false });
@@ -140,6 +188,13 @@ export default function HomePage() {
 
   const handleSortChange = (newSort: SortValue) => {
     updateURL(search, 1, layoutMode, newSort);
+  };
+
+  const handleTagsChange = ({
+    tagIds,
+    tagFilterMode: nextMode,
+  }: TagsDropdownChange) => {
+    updateURL(search, 1, layoutMode, sortMode, tagIds, nextMode);
   };
 
   return (
@@ -205,23 +260,32 @@ export default function HomePage() {
 
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
-          {isFetching && <MangasSkeleton />}
+          <div className="mb-4 flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="lg"
+              className="gap-2"
+              onClick={() => setIsFiltersVisible((prev) => !prev)}
+              aria-label={
+                isFiltersVisible
+                  ? "Hide filters section"
+                  : "Show filters section"
+              }
+              aria-expanded={isFiltersVisible}
+            >
+              <span className="md:hidden">
+                <HugeiconsIcon icon={FilterIcon} />
+              </span>
+              <span className="hidden md:inline">
+                {isFiltersVisible ? "Hide filters" : "Show filters"}
+              </span>
+              <span className="hidden md:inline-flex">
+                <HugeiconsIcon
+                  icon={isFiltersVisible ? ArrowUp01Icon : ArrowDown01Icon}
+                />
+              </span>
+            </Button>
 
-          {isError && (
-            <ErrorMessage message="Erreur lors du chargement des mangas." />
-          )}
-
-          <div className="flex items-end justify-between mb-8">
-            <div className="flex flex-col gap-2">
-              <p className="text-muted-foreground">Sort by</p>
-              <FiltersDropdown
-                value={sortMode}
-                onValueChange={handleSortChange}
-              />
-            </div>
-            {/* <h2 className="text-2xl font-bold text-card-foreground">
-                  {search ? `Results for "${search}"` : "Popular Manga"}
-                </h2> */}
             <div className="flex gap-2">
               <Button
                 size="icon-lg"
@@ -241,6 +305,38 @@ export default function HomePage() {
               </Button>
             </div>
           </div>
+
+          {isFiltersVisible && (
+            <div className="mb-8 rounded-xl border border-border/60 bg-card/30 p-3 sm:p-4">
+              <div className="flex flex-col gap-4 sm:gap-5 md:flex-row md:items-end md:justify-between">
+                <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-2 md:w-auto">
+                  <div className="flex min-w-0 flex-col gap-2">
+                    <p className="text-muted-foreground">Sort by</p>
+                    <FiltersDropdown
+                      value={sortMode}
+                      onValueChange={handleSortChange}
+                    />
+                  </div>
+
+                  <div className="flex min-w-0 flex-col gap-2">
+                    <p className="text-muted-foreground">Tags</p>
+                    <TagsDropdown
+                      language={language}
+                      selectedTagIds={selectedTagIds}
+                      tagFilterMode={tagFilterMode}
+                      onChange={handleTagsChange}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isFetching && <MangasSkeleton />}
+
+          {isError && (
+            <ErrorMessage message="Erreur lors du chargement des mangas." />
+          )}
 
           {!isLoading && !isError && (
             <MangasView mangas={data?.mangas} layout={layoutMode} />
