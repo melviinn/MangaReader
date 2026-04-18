@@ -79,14 +79,6 @@ const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
                     {manga.year}
                   </Badge>
                 )}
-                {manga.contentRating && (
-                  <Badge
-                    variant="ghost"
-                    className="text-xs pointer-events-none"
-                  >
-                    {formatLabel(manga.contentRating)}
-                  </Badge>
-                )}
               </div>
 
               {manga.description && (

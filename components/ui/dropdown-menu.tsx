@@ -6,7 +6,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import {
   ArrowRight01Icon,
-  CheckmarkSquare01Icon,
+  Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -180,7 +180,7 @@ function DropdownMenuCheckboxItem({
         data-slot="dropdown-menu-checkbox-item-indicator"
       >
         <MenuPrimitive.CheckboxItemIndicator>
-          <HugeiconsIcon icon={CheckmarkSquare01Icon} />
+          <HugeiconsIcon icon={Tick02Icon} />
         </MenuPrimitive.CheckboxItemIndicator>
       </span>
       {children}
@@ -220,7 +220,7 @@ function DropdownMenuRadioItem({
         data-slot="dropdown-menu-radio-item-indicator"
       >
         <MenuPrimitive.RadioItemIndicator>
-          <HugeiconsIcon icon={CheckmarkSquare01Icon} />
+          <HugeiconsIcon icon={Tick02Icon} />
         </MenuPrimitive.RadioItemIndicator>
       </span>
       {children}

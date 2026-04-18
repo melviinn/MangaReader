@@ -10,6 +10,18 @@ export async function GET(request: NextRequest) {
   const limit = Number(searchParams.get("limit") || "24");
   const offset = Number(searchParams.get("offset") || "0");
   const sort = normalizeSortValue(searchParams.get("sort"));
+  const tagMode =
+    searchParams.get("tagMode") === "exclude" ? "exclude" : "include";
+  const rawTagIds = searchParams.get("tagIds") || "";
+  const fallbackSingleTagId = searchParams.get("tagId") || "";
+  const tagIds = rawTagIds
+    .split(",")
+    .map((tagId) => tagId.trim())
+    .filter(Boolean);
+
+  if (tagIds.length === 0 && fallbackSingleTagId) {
+    tagIds.push(fallbackSingleTagId);
+  }
 
   try {
     const url = new URL(`${process.env.BASE_API_URL}/manga`);
@@ -24,12 +36,16 @@ export async function GET(request: NextRequest) {
     url.searchParams.append("availableTranslatedLanguage[]", language);
     url.searchParams.append("hasAvailableChapters", "true");
     url.searchParams.append("hasUnavailableChapters", "false");
-
-    // url.searchParams.append("publicationDemographic[]", "shounen");
     url.searchParams.append("contentRating[]", "safe"); // No hentai
-    // url.searchParams.append("contentRating[]", "suggestive"); // No hentai
-
     url.searchParams.append("includes[]", "cover_art");
+    if (tagIds.length > 0) {
+      const tagParamKey =
+        tagMode === "exclude" ? "excludedTags[]" : "includedTags[]";
+
+      tagIds.forEach((tagId) => {
+        url.searchParams.append(tagParamKey, tagId);
+      });
+    }
     url.searchParams.append(
       `order[${SORT_ORDER_MAP[sort].field}]`,
       SORT_ORDER_MAP[sort].direction,
@@ -43,7 +59,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      throw new Error("An unexpected error occurred, please try again later.");
+      const errorBody = await response.text();
+      throw new Error(
+        `MangaDex request failed (${response.status}): ${errorBody}`,
+      );
     }
 
     const data = await response.json();

@@ -20,7 +20,7 @@ const FiltersDropdown = ({ value, onValueChange }: FiltersDropdownProps) => {
       value={value}
       onValueChange={(nextValue) => onValueChange(nextValue as SortValue)}
     >
-      <SelectTrigger className="gap-14">
+      <SelectTrigger className="gap-8">
         <SelectValue />
       </SelectTrigger>
       <SelectContent alignItemWithTrigger={false}>
@@ -37,4 +37,3 @@ const FiltersDropdown = ({ value, onValueChange }: FiltersDropdownProps) => {
 };
 
 export { FiltersDropdown };
-export type { SortValue };
