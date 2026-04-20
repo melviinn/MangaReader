@@ -62,7 +62,7 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
   const hasStats = ratingLabel !== null || typeof manga.follows === "number";
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-4 rounded-2xl border border-border/60 bg-card/40 p-4 shadow-sm md:p-6">
+    <div className="mx-auto w-full max-w-7xl space-y-4 rounded-2xl border border-border/60 bg-card/40 p-4 shadow-sm md:p-6">
       <div className="space-y-3 text-center md:text-left">
         <h1 className="text-balance text-2xl font-bold tracking-tight text-foreground md:text-3xl">
           {mangaTitle}

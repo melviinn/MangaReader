@@ -19,11 +19,11 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ErrorMessage } from "../ErrorMessage";
-import { MangasSkeleton } from "../MangasSkeleton";
-import { MangasView } from "../MangasView";
 import { MangaPagination } from "../Pagination";
 import { SearchInput } from "../SearchInput";
 import { FiltersDropdown } from "../ui/filters-dropdown";
+import { MangasSkeleton } from "./Manga/MangasSkeleton";
+import { MangasView } from "./Manga/MangasView";
 import {
   TagsDropdown,
   type TagFilterMode,
@@ -332,7 +332,7 @@ export default function HomePage() {
             </div>
           )}
 
-          {isFetching && <MangasSkeleton />}
+          {isFetching && <MangasSkeleton layout={layoutMode} />}
 
           {isError && (
             <ErrorMessage message="Erreur lors du chargement des mangas." />

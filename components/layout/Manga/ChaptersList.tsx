@@ -133,14 +133,14 @@ function ChaptersListContent() {
   const haveChapters = chapters.length > 0;
 
   return (
-    <main className="w-full px-6 md:px-0 py-8 space-y-4">
+    <main className="w-full px-6 md:px-4 py-8 space-y-4">
       <MangaHeader
         manga={mangaDetails}
         mangaTitle={mangaDetails.title}
         language={language}
       />
 
-      <div className="max-w-7xl mx-auto py-10 px-2 md:px-4">
+      <div className="max-w-7xl mx-auto py-10">
         <div className="mb-4 rounded-xl border border-border/60 bg-card/30 p-3 md:p-4">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 ">
             <div className="min-w-0">
@@ -154,9 +154,6 @@ function ChaptersListContent() {
                   "No chapters available"
                 )}
               </h2>
-              {/* <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
-                Language: {currentLanguage?.label ?? "Unknown"}
-              </p> */}
             </div>
 
             <DropdownMenu>
@@ -190,7 +187,7 @@ function ChaptersListContent() {
           </div>
         </div>
 
-        <div className="flex justify-center mb-4 sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-4">
+        <div className="mb-4 mt-8">
           <SearchInput
             type="text"
             placeholder="Search chapters..."
