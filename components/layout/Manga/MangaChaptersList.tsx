@@ -80,7 +80,6 @@ async function fetchChapters(
 const LANGUAGES = [
   { code: "en", label: "English", flag: <FlagEN /> },
   { code: "fr", label: "Français", flag: <FlagFR /> },
-  { code: "ja", label: "日本語", flag: <FlagJA /> },
 ];
 
 function MangaChaptersListContent() {

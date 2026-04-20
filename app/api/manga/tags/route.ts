@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const language = searchParams.get("language") || "en";
 
-    const url = new URL(`${process.env.BASE_API_URL}/manga/tag`);
+    const url = new URL(`${process.env.API_TAG_URL}`);
 
     const response = await fetch(url.toString(), {
       method: "GET",
