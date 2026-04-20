@@ -3,10 +3,10 @@ import { MangaType } from "@/lib/types/mangaType";
 import Image from "next/image";
 import Link from "next/link";
 
-type MangasViewProps = {
+interface MangasViewProps {
   mangas?: MangaType[];
   layout?: "grid" | "compact";
-};
+}
 
 const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
   const formatLabel = (value: string) =>

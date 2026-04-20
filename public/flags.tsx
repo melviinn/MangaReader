@@ -1,4 +1,4 @@
-type ReactSvgElement = React.FC<React.SVGProps<SVGSVGElement>>;
+interface ReactSvgElement extends React.FC<React.SVGProps<SVGSVGElement>> {}
 
 const FlagFR: ReactSvgElement = (props) => {
   return (

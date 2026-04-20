@@ -19,9 +19,9 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ErrorMessage } from "../ErrorMessage";
-import { MangaPagination } from "../Pagination";
-import { SearchInput } from "../SearchInput";
+import { MangaPagination } from "../ui/pagination";
 import { FiltersDropdown } from "../ui/filters-dropdown";
+import { SearchInput } from "../ui/search-input";
 import {
   Select,
   SelectContent,

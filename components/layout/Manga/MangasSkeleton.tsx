@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-type MangasSkeletonProps = {
+interface MangasSkeletonProps {
   layout?: "grid" | "compact";
-};
+}
 
 export function MangasSkeleton({ layout = "grid" }: MangasSkeletonProps) {
   const count = layout === "compact" ? 8 : 12;

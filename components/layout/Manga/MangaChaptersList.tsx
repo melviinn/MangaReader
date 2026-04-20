@@ -1,6 +1,5 @@
 "use client";
 
-import { SearchInput } from "@/components/SearchInput";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,9 +7,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SearchInput } from "@/components/ui/search-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { MangaChapterType, MangaDetailsType } from "@/lib/types/mangaType";
-import { FlagEN, FlagFR, FlagJA } from "@/public/flags";
+import { FlagEN, FlagFR } from "@/public/flags";
 import { ArrowUpNarrowWideIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -268,7 +268,10 @@ function MangaChaptersListContent() {
         ) : filteredChapters.length === 0 ? (
           <p className="text-center text-gray-500">No chapters found.</p>
         ) : (
-          <MangaChaptersScrollArea chapters={filteredChapters} mangaId={mangaId} />
+          <MangaChaptersScrollArea
+            chapters={filteredChapters}
+            mangaId={mangaId}
+          />
         )}
       </div>
     </main>

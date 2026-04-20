@@ -8,11 +8,11 @@ import {
   SelectValue,
 } from "./select";
 
-type FiltersDropdownProps = {
+interface FiltersDropdownProps {
   value: SortValue;
   onValueChange: (value: SortValue) => void;
   triggerClassName?: string;
-};
+}
 
 const FiltersDropdown = ({
   value,

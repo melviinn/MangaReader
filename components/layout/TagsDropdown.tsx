@@ -34,13 +34,13 @@ type TagsDropdownChange = {
   tagFilterMode: TagFilterMode;
 };
 
-type TagsDropdownProps = {
+interface TagsDropdownProps {
   language: string;
   selectedTagIds: string[];
   tagFilterMode: TagFilterMode;
   triggerClassName?: string;
   onChange: (nextValue: TagsDropdownChange) => void;
-};
+}
 
 async function fetchMangaTags(
   language: string,
