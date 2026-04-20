@@ -16,7 +16,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChaptersScrollArea } from "./ChaptersScrollArea";
+import { MangaChaptersScrollArea } from "./MangaChaptersScrollArea";
 import { MangaHeader } from "./MangaHeader";
 
 function ChaptersSkeleton({ count }: { count: number }) {
@@ -83,7 +83,7 @@ const LANGUAGES = [
   { code: "ja", label: "日本語", flag: <FlagJA /> },
 ];
 
-function ChaptersListContent() {
+function MangaChaptersListContent() {
   const params = useParams();
   const mangaId = params.id as string;
   const [search, setSearch] = useState("");
@@ -269,13 +269,13 @@ function ChaptersListContent() {
         ) : filteredChapters.length === 0 ? (
           <p className="text-center text-gray-500">No chapters found.</p>
         ) : (
-          <ChaptersScrollArea chapters={filteredChapters} mangaId={mangaId} />
+          <MangaChaptersScrollArea chapters={filteredChapters} mangaId={mangaId} />
         )}
       </div>
     </main>
   );
 }
 
-export const ChaptersList = () => {
-  return <ChaptersListContent />;
+export const MangaChaptersList = () => {
+  return <MangaChaptersListContent />;
 };

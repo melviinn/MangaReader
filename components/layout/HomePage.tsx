@@ -22,6 +22,14 @@ import { ErrorMessage } from "../ErrorMessage";
 import { MangaPagination } from "../Pagination";
 import { SearchInput } from "../SearchInput";
 import { FiltersDropdown } from "../ui/filters-dropdown";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { MangasSkeleton } from "./Manga/MangasSkeleton";
 import { MangasView } from "./Manga/MangasView";
 import {
@@ -30,6 +38,34 @@ import {
   type TagsDropdownChange,
 } from "./TagsDropdown";
 
+type MangaStatusFilter =
+  | "all"
+  | "ongoing"
+  | "completed"
+  | "hiatus"
+  | "cancelled";
+type ContentRatingFilter = "safe" | "suggestive" | "erotica";
+
+const STATUS_FILTER_OPTIONS: { value: MangaStatusFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "ongoing", label: "Ongoing" },
+  { value: "completed", label: "Finished" },
+  { value: "hiatus", label: "Hiatus" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const CONTENT_RATING_OPTIONS: {
+  value: ContentRatingFilter;
+  label: string;
+}[] = [
+  { value: "safe", label: "Safe" },
+  { value: "suggestive", label: "Suggestive" },
+  { value: "erotica", label: "Erotica" },
+];
+
+const DEFAULT_STATUS_FILTER: MangaStatusFilter = "all";
+const DEFAULT_CONTENT_RATING: ContentRatingFilter = "safe";
+
 async function fetchMangas(
   search: string,
   page: number,
@@ -37,6 +73,8 @@ async function fetchMangas(
   sort: SortValue,
   tagIds: string[],
   tagFilterMode: TagFilterMode,
+  status: MangaStatusFilter,
+  contentRating: ContentRatingFilter,
 ): Promise<MangaResponseType> {
   const limit = 24;
   const offset = (page - 1) * limit;
@@ -53,6 +91,14 @@ async function fetchMangas(
   if (tagIds.length > 0) {
     params.append("tagIds", tagIds.join(","));
     params.append("tagMode", tagFilterMode);
+  }
+
+  if (status !== DEFAULT_STATUS_FILTER) {
+    params.append("status", status);
+  }
+
+  if (contentRating !== DEFAULT_CONTENT_RATING) {
+    params.append("contentRating", contentRating);
   }
 
   const res = await fetch(`/api/manga?${params.toString()}`);
@@ -74,6 +120,19 @@ export default function HomePage() {
     .filter(Boolean);
   const tagFilterMode: TagFilterMode =
     searchParams.get("tagMode") === "exclude" ? "exclude" : "include";
+  const statusFilter: MangaStatusFilter =
+    searchParams.get("status") === "ongoing" ||
+    searchParams.get("status") === "completed" ||
+    searchParams.get("status") === "hiatus" ||
+    searchParams.get("status") === "cancelled"
+      ? (searchParams.get("status") as MangaStatusFilter)
+      : DEFAULT_STATUS_FILTER;
+  const contentRatingFilter: ContentRatingFilter =
+    searchParams.get("contentRating") === "suggestive" ||
+    searchParams.get("contentRating") === "erotica"
+      ? (searchParams.get("contentRating") as ContentRatingFilter)
+      : DEFAULT_CONTENT_RATING;
+  const activeTagsCount = selectedTagIds.length;
   const layoutFromURL =
     searchParams.get("layout") === "compact" ? "compact" : "grid";
   const headerSectionRef = useRef<HTMLDivElement>(null);
@@ -96,6 +155,8 @@ export default function HomePage() {
       sortMode,
       selectedTagIds,
       tagFilterMode,
+      statusFilter,
+      contentRatingFilter,
     ],
     queryFn: () =>
       fetchMangas(
@@ -105,6 +166,8 @@ export default function HomePage() {
         sortMode,
         selectedTagIds,
         tagFilterMode,
+        statusFilter,
+        contentRatingFilter,
       ),
     staleTime: 1000 * 60,
     placeholderData: keepPreviousData,
@@ -125,6 +188,8 @@ export default function HomePage() {
     newSort: SortValue = sortMode,
     newTagIds: string[] = selectedTagIds,
     newTagFilterMode: TagFilterMode = tagFilterMode,
+    newStatus: MangaStatusFilter = statusFilter,
+    newContentRating: ContentRatingFilter = contentRatingFilter,
   ) => {
     const params = new URLSearchParams();
     if (newSearch.trim()) {
@@ -152,6 +217,14 @@ export default function HomePage() {
 
     if (newTagFilterMode !== "include") {
       params.set("tagMode", newTagFilterMode);
+    }
+
+    if (newStatus !== DEFAULT_STATUS_FILTER) {
+      params.set("status", newStatus);
+    }
+
+    if (newContentRating !== DEFAULT_CONTENT_RATING) {
+      params.set("contentRating", newContentRating);
     }
 
     router.replace(`/?${params.toString()}`, { scroll: false });
@@ -194,7 +267,64 @@ export default function HomePage() {
     tagIds,
     tagFilterMode: nextMode,
   }: TagsDropdownChange) => {
-    updateURL(search, 1, layoutMode, sortMode, tagIds, nextMode);
+    updateURL(
+      search,
+      1,
+      layoutMode,
+      sortMode,
+      tagIds,
+      nextMode,
+      statusFilter,
+      contentRatingFilter,
+    );
+  };
+
+  const handleStatusFilterChange = (status: MangaStatusFilter) => {
+    updateURL(
+      search,
+      1,
+      layoutMode,
+      sortMode,
+      selectedTagIds,
+      tagFilterMode,
+      status,
+      contentRatingFilter,
+    );
+  };
+
+  const handleContentRatingFilterChange = (
+    contentRating: ContentRatingFilter,
+  ) => {
+    updateURL(
+      search,
+      1,
+      layoutMode,
+      sortMode,
+      selectedTagIds,
+      tagFilterMode,
+      statusFilter,
+      contentRating,
+    );
+  };
+
+  const hasActiveFilters =
+    activeTagsCount > 0 ||
+    sortMode !== DEFAULT_SORT ||
+    tagFilterMode !== "include" ||
+    statusFilter !== DEFAULT_STATUS_FILTER ||
+    contentRatingFilter !== DEFAULT_CONTENT_RATING;
+
+  const handleResetFilters = () => {
+    updateURL(
+      search,
+      1,
+      layoutMode,
+      DEFAULT_SORT,
+      [],
+      "include",
+      DEFAULT_STATUS_FILTER,
+      DEFAULT_CONTENT_RATING,
+    );
   };
 
   return (
@@ -261,32 +391,44 @@ export default function HomePage() {
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-4 flex items-center justify-between">
-            <Button
-              variant="outline"
-              size="lg"
-              className="gap-2"
-              onClick={() => setIsFiltersVisible((prev) => !prev)}
-              aria-label={
-                isFiltersVisible
-                  ? "Hide filters section"
-                  : "Show filters section"
-              }
-              aria-expanded={isFiltersVisible}
-            >
-              <span className="md:hidden">
-                <HugeiconsIcon icon={FilterIcon} />
-              </span>
-              <span className="hidden md:inline">
-                {isFiltersVisible ? "Hide filters" : "Show filters"}
-              </span>
-              <span className="hidden md:inline-flex">
-                <HugeiconsIcon
-                  icon={isFiltersVisible ? ArrowUp01Icon : ArrowDown01Icon}
-                />
-              </span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="lg"
+                className="gap-2 md:min-w-40 md:justify-between"
+                onClick={() => setIsFiltersVisible((prev) => !prev)}
+                aria-label={
+                  isFiltersVisible
+                    ? "Hide filters section"
+                    : "Show filters section"
+                }
+                aria-expanded={isFiltersVisible}
+              >
+                <span className="md:hidden">
+                  <HugeiconsIcon icon={FilterIcon} />
+                </span>
+                <span className="hidden md:inline">
+                  {isFiltersVisible ? "Hide filters" : "Show filters"}
+                </span>
+                <span className="hidden md:inline-flex">
+                  <HugeiconsIcon
+                    icon={isFiltersVisible ? ArrowUp01Icon : ArrowDown01Icon}
+                  />
+                </span>
+              </Button>
 
-            <div className="flex gap-2">
+              {hasActiveFilters && (
+                <Button
+                  variant="destructive"
+                  size="lg"
+                  onClick={handleResetFilters}
+                >
+                  Reset filters
+                </Button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
               <Button
                 size="icon-lg"
                 variant={layoutMode === "compact" ? "default" : "outline"}
@@ -307,23 +449,83 @@ export default function HomePage() {
           </div>
 
           {isFiltersVisible && (
-            <div className="mb-8 rounded-xl border border-border/60 bg-card/30 p-3 sm:p-4">
-              <div className="flex flex-col gap-4 sm:gap-5 md:flex-row md:items-end md:justify-between">
-                <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-2 md:w-auto">
-                  <div className="flex min-w-0 flex-col gap-2">
-                    <p className="text-muted-foreground">Sort by</p>
+            <div className="mb-8 rounded-xl border border-border/60 bg-card/40 p-4 sm:p-5">
+              <div className="flex flex-col gap-4">
+                <div className="grid w-full grid-cols-2 gap-3 xl:grid-cols-4">
+                  <div className="flex min-w-0 flex-col gap-2 rounded-lg border border-border/50 bg-background/70 p-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Sort by
+                    </p>
                     <FiltersDropdown
                       value={sortMode}
                       onValueChange={handleSortChange}
+                      triggerClassName="min-w-0"
                     />
                   </div>
 
-                  <div className="flex min-w-0 flex-col gap-2">
-                    <p className="text-muted-foreground">Tags</p>
+                  <div className="flex min-w-0 flex-col gap-2 rounded-lg border border-border/50 bg-background/70 p-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Publication status
+                    </p>
+                    <Select
+                      items={STATUS_FILTER_OPTIONS}
+                      value={statusFilter}
+                      onValueChange={(nextValue) =>
+                        handleStatusFilterChange(nextValue as MangaStatusFilter)
+                      }
+                    >
+                      <SelectTrigger className="w-full min-w-0 justify-between gap-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent alignItemWithTrigger={false}>
+                        <SelectGroup>
+                          {STATUS_FILTER_OPTIONS.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex min-w-0 flex-col gap-2 rounded-lg border border-border/50 bg-background/70 p-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Content rating
+                    </p>
+                    <Select
+                      items={CONTENT_RATING_OPTIONS}
+                      value={contentRatingFilter}
+                      onValueChange={(nextValue) =>
+                        handleContentRatingFilterChange(
+                          nextValue as ContentRatingFilter,
+                        )
+                      }
+                    >
+                      <SelectTrigger className="w-full min-w-0 justify-between gap-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent alignItemWithTrigger={false}>
+                        <SelectGroup>
+                          {CONTENT_RATING_OPTIONS.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex min-w-0 flex-col gap-2 rounded-lg border border-border/50 bg-background/70 p-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Tags
+                    </p>
                     <TagsDropdown
                       language={language}
                       selectedTagIds={selectedTagIds}
                       tagFilterMode={tagFilterMode}
+                      triggerClassName="min-w-0"
                       onChange={handleTagsChange}
                     />
                   </div>

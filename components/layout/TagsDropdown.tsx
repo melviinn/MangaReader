@@ -38,6 +38,7 @@ type TagsDropdownProps = {
   language: string;
   selectedTagIds: string[];
   tagFilterMode: TagFilterMode;
+  triggerClassName?: string;
   onChange: (nextValue: TagsDropdownChange) => void;
 };
 
@@ -58,9 +59,16 @@ const TagsDropdown = ({
   language,
   selectedTagIds,
   tagFilterMode,
+  triggerClassName,
   onChange,
 }: TagsDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const triggerClasses = [
+    "w-full justify-between self-start gap-8",
+    triggerClassName,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const { data: tagsData, isLoading: isLoadingTags } = useQuery<
     MangaTagsResponseType,
@@ -89,13 +97,13 @@ const TagsDropdown = ({
   };
 
   return (
-    <div className="inline-flex w-fit">
+    <div className="inline-flex w-full">
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger
           render={
             <Button
               variant="outline"
-              className="w-fit self-start gap-8"
+              className={triggerClasses}
               disabled={isLoadingTags}
             >
               {selectedTagIds.length > 0

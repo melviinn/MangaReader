@@ -10,7 +10,7 @@ interface ChaptersScrollAreaProps {
   mangaId: string;
 }
 
-export const ChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
+export const MangaChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
   chapters,
   mangaId,
 }) => {

@@ -11,16 +11,25 @@ import {
 type FiltersDropdownProps = {
   value: SortValue;
   onValueChange: (value: SortValue) => void;
+  triggerClassName?: string;
 };
 
-const FiltersDropdown = ({ value, onValueChange }: FiltersDropdownProps) => {
+const FiltersDropdown = ({
+  value,
+  onValueChange,
+  triggerClassName,
+}: FiltersDropdownProps) => {
+  const triggerClasses = ["w-full justify-between gap-8", triggerClassName]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <Select
       items={SORT_OPTIONS}
       value={value}
       onValueChange={(nextValue) => onValueChange(nextValue as SortValue)}
     >
-      <SelectTrigger className="gap-8">
+      <SelectTrigger className={triggerClasses}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent alignItemWithTrigger={false}>
