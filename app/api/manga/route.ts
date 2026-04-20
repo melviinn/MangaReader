@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
   const limit = Number(searchParams.get("limit") || "24");
   const offset = Number(searchParams.get("offset") || "0");
   const sort = normalizeSortValue(searchParams.get("sort"));
+  const status = searchParams.get("status") || "";
+  const contentRating = searchParams.get("contentRating") || "safe";
   const tagMode =
     searchParams.get("tagMode") === "exclude" ? "exclude" : "include";
   const rawTagIds = searchParams.get("tagIds") || "";
@@ -36,8 +38,11 @@ export async function GET(request: NextRequest) {
     url.searchParams.append("availableTranslatedLanguage[]", language);
     url.searchParams.append("hasAvailableChapters", "true");
     url.searchParams.append("hasUnavailableChapters", "false");
-    url.searchParams.append("contentRating[]", "safe"); // No hentai
+    url.searchParams.append("contentRating[]", contentRating);
     url.searchParams.append("includes[]", "cover_art");
+    if (status) {
+      url.searchParams.append("status[]", status);
+    }
     if (tagIds.length > 0) {
       const tagParamKey =
         tagMode === "exclude" ? "excludedTags[]" : "includedTags[]";

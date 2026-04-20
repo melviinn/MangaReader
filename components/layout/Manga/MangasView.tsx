@@ -37,8 +37,8 @@ const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
           key={manga.id}
           className={
             layout === "compact"
-              ? "flex items-start gap-3 rounded-lg border border-border/60 bg-card/30 p-3 hover:bg-card/50 transition-colors duration-200"
-              : "w-full min-w-0 space-y-2 cursor-pointer hover:opacity-90 transition-opacity duration-200"
+              ? "group flex items-start gap-3 rounded-lg border border-border/60 bg-card/30 p-3 transition-all duration-200 hover:border-primary/50 hover:bg-card/70"
+              : "group w-full min-w-0 space-y-2 cursor-pointer rounded-md border border-border/60 bg-card/30 p-1 transition-all duration-200 hover:border-primary/50 hover:bg-card/70"
           }
         >
           <div
@@ -54,14 +54,14 @@ const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
                 alt={manga.title}
                 fill
                 sizes="300px"
-                className="object-cover"
+                className="object-cover transition-transform duration-300"
               />
             )}
           </div>
 
           {layout === "compact" ? (
             <div className="min-w-0 flex-1 space-y-2">
-              <h2 className="text-sm font-semibold leading-tight text-left line-clamp-2">
+              <h2 className="text-sm font-semibold leading-tight text-left line-clamp-2 transition-colors group-hover:text-primary">
                 {manga.title}
               </h2>
 
@@ -88,7 +88,7 @@ const MangasView = ({ mangas, layout = "grid" }: MangasViewProps) => {
               )}
             </div>
           ) : (
-            <h2 className="text-sm font-medium leading-tight text-center">
+            <h2 className="text-sm font-medium leading-tight text-center transition-colors group-hover:text-primary">
               {manga.title}
             </h2>
           )}

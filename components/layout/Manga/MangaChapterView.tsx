@@ -26,7 +26,7 @@ async function fetchChaptersList(mangaId: string, language: string) {
   return res.json() as Promise<{ chapters: MangaChapterType[] }>;
 }
 
-export const ChapterView = () => {
+export const MangaChapterView = () => {
   const params = useParams();
   const router = useRouter();
   const chapterId = params.chapter as string;
