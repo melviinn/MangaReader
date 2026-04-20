@@ -20,7 +20,7 @@ export const ChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
 
   return (
     <div className="w-full rounded-md border bg-background">
-      <div className="max-h-96 overflow-y-auto scrollbar-thin">
+      <div className="max-h-96 overflow-y-auto">
         <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 md:grid-cols-4">
           {chapters.map((chapter) => {
             const date = chapter.publishedAt

@@ -8,13 +8,43 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { MangaChapterType, MangaDetailsType } from "@/lib/types/mangaType";
 import { FlagEN, FlagFR, FlagJA } from "@/public/flags";
-import { useQuery } from "@tanstack/react-query";
+import { ArrowUpNarrowWideIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChaptersScrollArea } from "./ChaptersScrollArea";
 import { MangaHeader } from "./MangaHeader";
+
+function ChaptersSkeleton({ count }: { count: number }) {
+  return (
+    <div className="w-full rounded-md border bg-background">
+      <div className="max-h-96 overflow-y-auto scrollbar-thin">
+        <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 md:grid-cols-4">
+          {Array.from({ length: count }).map((_, index) => (
+            <Button
+              key={index}
+              type="button"
+              variant="secondary"
+              disabled
+              className="group flex h-auto w-full min-w-0 flex-col items-start justify-start gap-1 rounded-md border bg-card px-3 py-2 text-left transition-all"
+            >
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="hidden h-3 w-full sm:block" />
+              <div className="mt-auto flex w-full items-center justify-between gap-2">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="hidden h-3 w-12 sm:inline" />
+              </div>
+            </Button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 async function fetchMangaDetails(
   mangaId: string,
@@ -33,9 +63,10 @@ async function fetchMangaDetails(
 async function fetchChapters(
   mangaId: string,
   language: string,
+  order: "asc" | "desc",
 ): Promise<MangaChapterType[]> {
   const res = await fetch(
-    `/api/manga/${mangaId}/chapters?language=${language}`,
+    `/api/manga/${mangaId}/chapters?language=${language}&order=${order}`,
   );
 
   if (!res.ok) {
@@ -57,6 +88,11 @@ function ChaptersListContent() {
   const mangaId = params.id as string;
   const [search, setSearch] = useState("");
   const [language, setLanguage] = useState("en");
+  const [chaptersOrder, setChaptersOrder] = useState<
+    "ascending" | "descending"
+  >("descending");
+  const [isSortPending, setIsSortPending] = useState(false);
+  const apiOrder = chaptersOrder === "ascending" ? "asc" : "desc";
 
   // Charger la langue depuis localStorage au montage
   useEffect(() => {
@@ -88,13 +124,21 @@ function ChaptersListContent() {
   const {
     data: chapters,
     isLoading,
+    isFetching,
     isError,
   } = useQuery<MangaChapterType[]>({
-    queryKey: ["chapters", mangaId, language],
-    queryFn: () => fetchChapters(mangaId, language),
+    queryKey: ["chapters", mangaId, language, apiOrder],
+    queryFn: () => fetchChapters(mangaId, language, apiOrder),
     enabled: !!mangaId,
+    placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5,
   });
+
+  useEffect(() => {
+    if (!isFetching) {
+      setIsSortPending(false);
+    }
+  }, [isFetching]);
 
   const currentLanguage = LANGUAGES.find((lang) => lang.code === language);
 
@@ -129,6 +173,7 @@ function ChaptersListContent() {
           chapter.chapter?.includes(search.trim()) ||
           chapter.title?.toLowerCase().includes(search.trim().toLowerCase()),
       );
+  const skeletonCount = Math.max(filteredChapters.length, 1);
 
   const haveChapters = chapters.length > 0;
 
@@ -187,15 +232,41 @@ function ChaptersListContent() {
           </div>
         </div>
 
-        <div className="mb-4 mt-8">
-          <SearchInput
-            type="text"
-            placeholder="Search chapters..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="mb-4 mt-8 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+          <div className="w-full max-w-sm md:max-w-md">
+            <SearchInput
+              type="text"
+              placeholder="Search chapters..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          <Button
+            variant="outline"
+            size="icon-lg"
+            // className="h-10 w-10 p-0"
+            onClick={() => {
+              setIsSortPending(true);
+              setChaptersOrder((prev) =>
+                prev === "ascending" ? "descending" : "ascending",
+              );
+            }}
+            aria-label={`Toggle chapters order, current: ${chaptersOrder}`}
+          >
+            <HugeiconsIcon
+              icon={ArrowUpNarrowWideIcon}
+              className={
+                chaptersOrder === "descending"
+                  ? "size-4 -rotate-180 transition duration-300 ease-linear"
+                  : "size-4 transition duration-300 ease-linear"
+              }
+            />
+          </Button>
         </div>
-        {filteredChapters.length === 0 ? (
+        {isSortPending && isFetching ? (
+          <ChaptersSkeleton count={skeletonCount} />
+        ) : filteredChapters.length === 0 ? (
           <p className="text-center text-gray-500">No chapters found.</p>
         ) : (
           <ChaptersScrollArea chapters={filteredChapters} mangaId={mangaId} />

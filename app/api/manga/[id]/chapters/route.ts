@@ -41,6 +41,7 @@ export async function GET(
     const { id } = await props.params;
     const { searchParams } = new URL(req.url);
     const language = searchParams.get("language") || "en";
+    const order = searchParams.get("order") === "desc" ? "desc" : "asc";
 
     if (!id) throw new Error("Manga ID is missing");
     if (!process.env.BASE_API_URL) throw new Error("BASE_API_URL not set");
@@ -53,7 +54,7 @@ export async function GET(
     url.searchParams.append("includeExternalUrl", "0");
     url.searchParams.append("includeFuturePublishAt", "0");
     url.searchParams.append("includes[]", "scanlation_group");
-    url.searchParams.append("order[chapter]", "asc");
+    url.searchParams.append("order[chapter]", order);
     url.searchParams.append("limit", "500");
 
     const res = await fetch(url.toString(), {
@@ -76,7 +77,11 @@ export async function GET(
 
     for (const chapter of data.data ?? []) {
       for (const rel of chapter?.relationships ?? []) {
-        if (rel?.type === "scanlation_group" && rel?.id && rel?.attributes?.name) {
+        if (
+          rel?.type === "scanlation_group" &&
+          rel?.id &&
+          rel?.attributes?.name
+        ) {
           includedGroups.set(rel.id, rel.attributes.name);
         }
       }
