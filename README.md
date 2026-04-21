@@ -64,6 +64,8 @@ pnpm install
 
 ```env
 BASE_API_URL=https://api.mangadex.org
+API_COVER_URL="https://uploads.mangadex.org/covers"
+API_TAG_URL="https://api.mangadex.org/manga/tag"
 ```
 
 4. Run the development server
