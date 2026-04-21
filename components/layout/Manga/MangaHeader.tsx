@@ -1,5 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import type { MangaDetailsType } from "@/lib/types/mangaType";
+import { formatMangaDescription } from "@/lib/utils";
+import { FavouriteIcon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 
 interface MangaHeaderProps {
@@ -17,6 +20,8 @@ const STATUS_LABELS: Record<string, Record<string, string>> = {
 export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
   if (!manga) return null;
 
+  const safeDescription = formatMangaDescription(manga.description, 360);
+
   const statusLabel = manga.status
     ? (STATUS_LABELS[language]?.[manga.status.toLowerCase()] ?? manga.status)
     : null;
@@ -25,81 +30,147 @@ export function MangaHeader({ manga, mangaTitle, language }: MangaHeaderProps) {
     ? `/api/manga/cover/${manga.id}/${encodeURIComponent(manga.coverArt.attributes.fileName)}`
     : null;
 
+  const authorNames = manga.authors
+    .filter((author) => author.role === "author")
+    .map((author) => author.name);
+  const artistNames = manga.authors
+    .filter((author) => author.role === "artist")
+    .map((artist) => artist.name);
+  const fallbackContributors = manga.authors.map((person) => person.name);
+
+  const displayAuthors =
+    authorNames.length > 0
+      ? Array.from(new Set(authorNames))
+      : Array.from(new Set(fallbackContributors));
+  const normalizedAuthorSet = new Set(
+    displayAuthors.map((name) => name.trim().toLowerCase()),
+  );
+  const displayArtists =
+    artistNames.length > 0
+      ? Array.from(new Set(artistNames)).filter(
+          (name) => !normalizedAuthorSet.has(name.trim().toLowerCase()),
+        )
+      : [];
+  const authorLabel = displayAuthors.join(", ");
+
+  const ratingLabel =
+    typeof manga.ratingBayesian === "number"
+      ? manga.ratingBayesian
+      : typeof manga.ratingAverage === "number"
+        ? manga.ratingAverage
+        : null;
+  const hasStats = ratingLabel !== null || typeof manga.follows === "number";
+
   return (
-    <div className="bg-card w-full max-w-5xl mx-auto px-4 rounded-lg border p-4 md:p-6 shadow-md space-y-6">
-      {/* Header: Infos à gauche, cover à droite */}
-      <div className="flex flex-col md:flex-row gap-4">
-        {/* Infos à gauche */}
-        <div className="flex-1 flex flex-col gap-1 items-center">
-          <div className="flex flex-wrap items-baseline text-center gap-2 border rounded-xl px-2 md:px-6 py-2 bg-primary">
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-primary-foreground">
-              {mangaTitle}
-            </h1>
-          </div>
+    <div className="mx-auto w-full max-w-7xl space-y-4 rounded-2xl border border-border/60 bg-card/40 p-4 shadow-sm md:p-6">
+      <div className="space-y-3 text-center md:text-left">
+        <h1 className="text-balance text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+          {mangaTitle}
+        </h1>
+
+        <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
+          {statusLabel && (
+            <Badge
+              className={
+                manga.status?.toLowerCase() === "completed"
+                  ? "bg-green-900 text-green-300"
+                  : manga.status?.toLowerCase() === "cancelled"
+                    ? "bg-red-950 text-red-300"
+                    : ""
+              }
+            >
+              {statusLabel}
+            </Badge>
+          )}
+          {manga.year && <Badge variant="outline">{manga.year}</Badge>}
+          {/* {manga.contentRating && (
+            <Badge variant="outline">{manga.contentRating}</Badge>
+          )} */}
         </div>
+
+        {displayAuthors.length > 0 && (
+          <p className="text-sm text-muted-foreground">
+            By{" "}
+            <span className="font-medium text-foreground">{authorLabel}</span>
+          </p>
+        )}
       </div>
 
-      <div className="w-full flex flex-col md:flex-row gap-4 justify-center  items-start">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[170px_minmax(0,1fr)] md:gap-6">
         {coverUrl && (
-          <Image
-            src={coverUrl}
-            alt={`${mangaTitle} cover`}
-            width={288}
-            height={432}
-            className="w-72 md:w-40 lg:w-48 h-auto rounded-md object-cover self-center md:self-start"
-          />
+          <div className="flex justify-center md:justify-start">
+            <Image
+              src={coverUrl}
+              alt={`${mangaTitle} cover`}
+              width={288}
+              height={432}
+              className="h-auto w-36 rounded-lg object-cover shadow-sm sm:w-40"
+            />
+          </div>
         )}
 
-        <div className="flex flex-col space-y-4 w-full">
-          {manga.description && (
-            <div className="text-gray-200">{manga.description}</div>
-          )}
+        <div className="min-w-0 space-y-4 text-center md:text-left">
+          <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+            {safeDescription || "No description available."}
+          </p>
 
-          {/* TODO: Change to shadcn Table */}
-          <table>
-            <tbody>
-              <tr>
-                <td className="pr-4">
-                  {manga.authors.length > 0 && (
-                    <p className="text-gray-300 text-sm mt-1">
-                      Author{manga.authors.length > 1 ? "s" : ""}:
-                      <strong>
-                        {" "}
-                        {manga.authors.map((a) => a.name).join(", ")}
-                      </strong>
-                    </p>
-                  )}
-                </td>
-                <td>
-                  {manga.status && (
-                    <p className="text-gray-300 text-sm mt-1">
-                      Status:{" "}
-                      <Badge
-                        className={
-                          manga.status.toLowerCase() === "completed"
-                            ? "bg-green-900 text-green-300"
-                            : manga.status.toLowerCase() === "cancelled"
-                              ? "bg-red-950 text-red-300"
-                              : ""
-                        }
-                      >
-                        {statusLabel}
-                      </Badge>
-                    </p>
-                  )}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {displayArtists.length > 0 && (
+              <div className="rounded-lg border border-border/60 bg-background/60 p-3">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Artist{displayArtists.length > 1 ? "s" : ""}
+                </p>
+                <p className="mt-1 text-sm font-medium text-foreground">
+                  {displayArtists.join(", ")}
+                </p>
+              </div>
+            )}
+
+            {hasStats && (
+              <div className="rounded-lg border border-border/60 bg-background/60 p-3">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Stats
+                </p>
+                <div className="mt-2 grid grid-cols-1 gap-2">
+                  <div className="flex items-center justify-between rounded-md border border-border/60 bg-card/50 px-2.5 py-2">
+                    <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <HugeiconsIcon
+                        icon={FavouriteIcon}
+                        size={15}
+                        className="text-rose-400 fill-rose-400"
+                      />
+                      Rating
+                    </span>
+                    <span className="text-sm font-semibold text-primary">
+                      {ratingLabel !== null ? ratingLabel.toFixed(2) : "N/A"}
+                      <span className="text-foreground"> / 10</span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-md border border-border/60 bg-card/50 px-2.5 py-2">
+                    <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <HugeiconsIcon
+                        icon={UserGroupIcon}
+                        size={15}
+                        className="text-blue-400"
+                      />
+                      Followers
+                    </span>
+                    <span className="text-sm font-semibold text-primary">
+                      {typeof manga.follows === "number"
+                        ? manga.follows.toLocaleString()
+                        : "N/A"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {manga.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-center gap-2 md:justify-start">
               {manga.tags.map((tag) => (
-                <Badge
-                  key={tag.id}
-                  variant="outline"
-                  className="text-xs p-2 bg-[#2a2a2a] border-[#444] text-gray-300 cursor-default"
-                >
+                <Badge key={tag.id} variant="outline" className="text-xs">
                   {tag.name}
                 </Badge>
               ))}

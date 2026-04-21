@@ -1,4 +1,4 @@
-import { ChapterView } from "@/components/layout/Manga/ChapterView";
+import { MangaChapterView } from "@/components/layout/Manga/MangaChapterView";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function ChapterPage() {
-  return <ChapterView />;
+  return <MangaChapterView />;
 }

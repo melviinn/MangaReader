@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import type { ChapterImagesType } from "@/lib/types/mangaType";
+import type { ChapterImagesType, MangaChapterType } from "@/lib/types/mangaType";
 import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -23,10 +23,10 @@ async function fetchChaptersList(mangaId: string, language: string) {
     `/api/manga/${mangaId}/chapters?language=${language}`,
   );
   if (!res.ok) throw new Error("Failed to load chapters");
-  return res.json();
+  return res.json() as Promise<{ chapters: MangaChapterType[] }>;
 }
 
-export const ChapterView = () => {
+export const MangaChapterView = () => {
   const params = useParams();
   const router = useRouter();
   const chapterId = params.chapter as string;
@@ -64,6 +64,10 @@ export const ChapterView = () => {
   const currentChapter = chapters.find((ch: any) => ch.id === chapterId);
   const currentChapterName =
     currentChapter?.title || `Chapter ${currentChapter?.chapter || "unknown"}`;
+  const scanlationNames =
+    currentChapter?.scanlationGroups
+      ?.map((group: { name: string }) => group.name)
+      .filter(Boolean) ?? [];
 
   const currentChapterNumber =
     currentChapterIndex !== -1 ? chapters[currentChapterIndex].chapter : null;
@@ -108,6 +112,17 @@ export const ChapterView = () => {
           <h1 className="text-2xl font-semibold tracking-tight">
             {currentChapterName}
           </h1>
+        </div>
+        <div className="rounded-md border bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
+          <p>
+            Powered by MangaDex.
+            {scanlationNames.length > 0
+              ? ` Scanlation: ${scanlationNames.join(", ")}.`
+              : " Scanlation group information unavailable for this chapter."}
+          </p>
+          <p className="text-xs mt-1">
+            Non-commercial use only. Respect scanlation group removal requests.
+          </p>
         </div>
         <div className="flex justify-between items-center gap-4 sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-10 py-4 border-b">
           <Button

@@ -1,5 +1,5 @@
 const DEFAULT_MANGADEX_USER_AGENT =
-  "MangaReader/1.0 (+https://github.com/melvin)";
+  "MangaReader/1.0 (+https://github.com/melviinn)";
 
 export function mangaDexHeaders(init?: HeadersInit): Headers {
   const headers = new Headers(init);

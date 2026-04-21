@@ -2,6 +2,11 @@ export type MangaType = {
   id: string;
   title: string;
   coverUrl: string | null;
+  description?: string | null;
+  status?: string | null;
+  year?: number | null;
+  contentRating?: string | null;
+  publicationDemographic?: string | null;
 };
 
 export type MangaResponseType = {
@@ -16,9 +21,9 @@ export type MangaChapterType = {
   title: string | null;
   chapter: string | null;
   volume: string | null;
+  pages?: number | null;
   publishedAt?: string | null;
-
-  // pages: number;
+  scanlationGroups?: { id: string; name: string }[];
 };
 
 export type ChapterImagesType = {
@@ -35,6 +40,9 @@ export type MangaDetailsType = {
   title: string;
   year: number | null;
   contentRating: string | null;
+  ratingAverage?: number | null;
+  ratingBayesian?: number | null;
+  follows?: number | null;
   tags: { id: string; name: string }[];
   authors: { id: string; name: string; role: string }[];
   coverArt: {
