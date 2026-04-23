@@ -7,6 +7,8 @@ export type MangaType = {
   year?: number | null;
   contentRating?: string | null;
   publicationDemographic?: string | null;
+  ratingAverage?: number | null;
+  follows?: number | null;
 };
 
 export type MangaResponseType = {

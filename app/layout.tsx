@@ -40,6 +40,12 @@ export default function RootLayout({
       suppressHydrationWarning
       suppressContentEditableWarning
     >
+      {/* <head>
+        <meta
+          name="format-detection"
+          content="telephone=no, date=no, email=no, address=no"
+        />
+      </head> */}
       <body className={`${outfit.variable} antialiased min-h-dvh`}>
         <Providers>
           <div className="min-h-dvh flex flex-col">

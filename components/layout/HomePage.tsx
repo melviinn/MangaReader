@@ -19,8 +19,8 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ErrorMessage } from "../ErrorMessage";
-import { MangaPagination } from "../ui/pagination";
 import { FiltersDropdown } from "../ui/filters-dropdown";
+import { MangaPagination } from "../ui/pagination";
 import { SearchInput } from "../ui/search-input";
 import {
   Select,
@@ -84,22 +84,17 @@ async function fetchMangas(
     language,
     sort,
   });
-  if (search.trim() !== "") {
-    params.append("title", search);
-  }
+  if (search.trim() !== "") params.append("title", search);
 
   if (tagIds.length > 0) {
     params.append("tagIds", tagIds.join(","));
     params.append("tagMode", tagFilterMode);
   }
 
-  if (status !== DEFAULT_STATUS_FILTER) {
-    params.append("status", status);
-  }
+  if (status !== DEFAULT_STATUS_FILTER) params.append("status", status);
 
-  if (contentRating !== DEFAULT_CONTENT_RATING) {
+  if (contentRating !== DEFAULT_CONTENT_RATING)
     params.append("contentRating", contentRating);
-  }
 
   const res = await fetch(`/api/manga?${params.toString()}`);
   if (!res.ok)
@@ -192,40 +187,24 @@ export default function HomePage() {
     newContentRating: ContentRatingFilter = contentRatingFilter,
   ) => {
     const params = new URLSearchParams();
-    if (newSearch.trim()) {
-      params.set("search", newSearch);
-    }
-    if (language !== "en") {
-      params.set("language", language);
-    }
+    if (newSearch.trim()) params.set("search", newSearch);
 
-    if (newPage > 1) {
-      params.set("page", String(newPage));
-    }
+    if (language !== "en") params.set("language", language);
 
-    if (newLayout !== "grid") {
-      params.set("layout", newLayout);
-    }
+    if (newPage > 1) params.set("page", String(newPage));
 
-    if (newSort !== DEFAULT_SORT) {
-      params.set("sort", newSort);
-    }
+    if (newLayout !== "grid") params.set("layout", newLayout);
 
-    if (newTagIds.length > 0) {
-      params.set("tags", newTagIds.join(","));
-    }
+    if (newSort !== DEFAULT_SORT) params.set("sort", newSort);
 
-    if (newTagFilterMode !== "include") {
-      params.set("tagMode", newTagFilterMode);
-    }
+    if (newTagIds.length > 0) params.set("tags", newTagIds.join(","));
 
-    if (newStatus !== DEFAULT_STATUS_FILTER) {
-      params.set("status", newStatus);
-    }
+    if (newTagFilterMode !== "include") params.set("tagMode", newTagFilterMode);
 
-    if (newContentRating !== DEFAULT_CONTENT_RATING) {
+    if (newStatus !== DEFAULT_STATUS_FILTER) params.set("status", newStatus);
+
+    if (newContentRating !== DEFAULT_CONTENT_RATING)
       params.set("contentRating", newContentRating);
-    }
 
     router.replace(`/?${params.toString()}`, { scroll: false });
   };
@@ -242,9 +221,7 @@ export default function HomePage() {
     const value = e.target.value;
     setSearchInput(value);
 
-    if (value.trim() === "") {
-      updateURL("", 1);
-    }
+    if (value.trim() === "") updateURL("", 1);
   };
 
   const handlePageChange = (newPage: number | ((p: number) => number)) => {
@@ -355,15 +332,16 @@ export default function HomePage() {
 
             <form
               className="flex w-full max-w-xl items-center gap-3"
+              id="manga-search-form"
               onSubmit={handleSubmit}
             >
               <SearchInput
                 placeholder="Search mangas..."
-                type="text"
+                type="search"
                 value={searchInput}
                 onChange={onChangeValue}
               />
-              <Button type="submit" size="lg">
+              <Button type="submit" size="lg" className="py-4.5 px-4">
                 Search
               </Button>
             </form>
