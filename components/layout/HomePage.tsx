@@ -325,7 +325,7 @@ export default function HomePage() {
               <br />
               <span className="text-primary">Favorite Manga</span>
             </h1>
-            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mb-8 text-pretty font-heading">
+            <p className="text-muted-foreground md:text-lg max-w-2xl mb-8 text-pretty font-heading">
               Browse thousands of mangas from action to romance. Find your next
               adventure and start reading today.
             </p>
