@@ -2,13 +2,19 @@ import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import Providers from "@/lib/providers";
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Figtree, Outfit } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
   weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-figtree",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -36,17 +42,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="dark"
       suppressHydrationWarning
       suppressContentEditableWarning
     >
-      {/* <head>
-        <meta
-          name="format-detection"
-          content="telephone=no, date=no, email=no, address=no"
-        />
-      </head> */}
-      <body className={`${outfit.variable} antialiased min-h-dvh`}>
+      <body
+        className={`${outfit.variable} ${figtree.variable} antialiased min-h-dvh`}
+      >
         <Providers>
           <div className="min-h-dvh flex flex-col">
             <Navbar />

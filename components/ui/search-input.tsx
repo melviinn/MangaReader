@@ -10,7 +10,7 @@ interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
 export const SearchInput = ({ placeholder, ...props }: SearchInputProps) => {
   return (
     <InputGroup>
-      <InputGroupInput placeholder="Search mangas..." {...props} />
+      <InputGroupInput placeholder={placeholder} {...props} />
       <InputGroupAddon>
         <HugeiconsIcon icon={Search01Icon} />
       </InputGroupAddon>

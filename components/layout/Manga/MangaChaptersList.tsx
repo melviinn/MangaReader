@@ -234,7 +234,7 @@ function MangaChaptersListContent() {
         <div className="mb-4 mt-8 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <div className="w-full max-w-sm md:max-w-md">
             <SearchInput
-              type="text"
+              type="search"
               placeholder="Search chapters..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
