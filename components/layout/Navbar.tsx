@@ -19,17 +19,17 @@ const Navbar = () => {
 
   return (
     <div className="w-full bg-primary">
-      <div className="h-14 px-3 sm:px-6 md:px-8 flex items-center justify-between">
-        <Link href="/" className="flex h-full items-center">
+      <div className="h-14 pr-7 md:pr-6 flex items-center justify-between">
+        <Link href="/">
           <Image
             src="/MangaReaderLogo.png"
             alt="MangaReader Logo"
             width={128}
             height={48}
-            className="h-11 sm:h-12 w-auto object-contain"
+            className="h-16 sm:h-14 w-auto object-contain"
           />
         </Link>
-        <nav className="flex h-full items-center text-sm sm:text-base gap-4 sm:gap-8 font-medium text-primary-foreground">
+        <nav className="flex h-full items-center text-sm md:text-base gap-4 md:gap-8 font-medium text-primary-foreground">
           {navLinks.map((link) => (
             <Link
               key={link.name}

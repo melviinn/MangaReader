@@ -72,32 +72,63 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
-    const mangas = data.data.map((manga: any) => {
-      const coverArt = manga.relationships.find(
-        (rel: any) => rel.type === "cover_art",
-      );
-      const coverFileName = coverArt?.attributes?.fileName
-        ? `${coverArt.attributes.fileName}.256.jpg`
-        : null;
+    // Récupération des statistiques une par une (pas de batch sur MangaDex)
+    const mangas = await Promise.all(
+      data.data.map(async (manga: any) => {
+        const coverArt = manga.relationships.find(
+          (rel: any) => rel.type === "cover_art",
+        );
+        const coverFileName = coverArt?.attributes?.fileName
+          ? `${coverArt.attributes.fileName}.256.jpg`
+          : null;
 
-      return {
-        id: manga.id,
-        title:
-          manga.attributes.title["en"] ||
-          Object.values(manga.attributes.title)[0],
-        description:
-          manga.attributes.description["en"] ||
-          Object.values(manga.attributes.description || {})[0] ||
-          "No description available",
-        status: manga.attributes.status,
-        year: manga.attributes.year,
-        contentRating: manga.attributes.contentRating,
-        publicationDemographic: manga.attributes.publicationDemographic,
-        coverUrl: coverFileName
-          ? `/api/manga/cover/${manga.id}/${encodeURIComponent(coverFileName)}`
-          : null,
-      };
-    });
+        let ratingAverage: number | null = null;
+        let follows: number | null = null;
+        try {
+          const statsUrl = new URL(
+            `${process.env.BASE_API_URL}/statistics/manga/${manga.id}`,
+          );
+          const statsRes = await fetch(statsUrl.toString(), {
+            headers: mangaDexHeaders({ "Content-Type": "application/json" }),
+            next: { revalidate: 3600 },
+          });
+          if (statsRes.ok) {
+            const statsPayload = await statsRes.json();
+            const statsData = statsPayload?.statistics?.[manga.id] ?? {};
+            const average = statsData?.rating?.average;
+            const followsCount = statsData?.follows;
+            ratingAverage =
+              typeof average === "number" && Number.isFinite(average)
+                ? average
+                : null;
+            follows =
+              typeof followsCount === "number" && Number.isFinite(followsCount)
+                ? followsCount
+                : null;
+          }
+        } catch {}
+
+        return {
+          id: manga.id,
+          title:
+            manga.attributes.title["en"] ||
+            Object.values(manga.attributes.title)[0],
+          description:
+            manga.attributes.description["en"] ||
+            Object.values(manga.attributes.description || {})[0] ||
+            "No description available",
+          status: manga.attributes.status,
+          year: manga.attributes.year,
+          contentRating: manga.attributes.contentRating,
+          publicationDemographic: manga.attributes.publicationDemographic,
+          coverUrl: coverFileName
+            ? `/api/manga/cover/${manga.id}/${encodeURIComponent(coverFileName)}`
+            : null,
+          ratingAverage,
+          follows,
+        };
+      }),
+    );
 
     return NextResponse.json({
       total: data.total,

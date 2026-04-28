@@ -87,27 +87,46 @@ function MangaChaptersListContent() {
   const mangaId = params.id as string;
   const [search, setSearch] = useState("");
   const [language, setLanguage] = useState("en");
+  // Charger l'ordre depuis localStorage au montage
   const [chaptersOrder, setChaptersOrder] = useState<
     "ascending" | "descending"
-  >("descending");
+  >(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`manga_${mangaId}_chaptersOrder`);
+      if (saved === "ascending" || saved === "descending") return saved;
+    }
+    return "descending";
+  });
   const [isSortPending, setIsSortPending] = useState(false);
   const apiOrder = chaptersOrder === "ascending" ? "asc" : "desc";
 
-  // Charger la langue depuis localStorage au montage
+  // Charger la langue et l'ordre depuis localStorage au montage
   useEffect(() => {
     const savedLanguage = localStorage.getItem(`manga_${mangaId}_language`);
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
-    }
+    if (savedLanguage) setLanguage(savedLanguage);
+
+    const savedOrder = localStorage.getItem(`manga_${mangaId}_chaptersOrder`);
+    if (savedOrder === "ascending" || savedOrder === "descending")
+      setChaptersOrder(savedOrder);
   }, [mangaId]);
 
   // Sauvegarder la langue dans localStorage quand elle change
+
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
     localStorage.setItem(`manga_${mangaId}_language`, newLanguage);
   };
 
-  // Get manga details for title and other info
+  // Sauvegarder l'ordre dans localStorage quand il change
+  const handleOrderChange = () => {
+    setIsSortPending(true);
+    setChaptersOrder((prev) => {
+      const next = prev === "ascending" ? "descending" : "ascending";
+      localStorage.setItem(`manga_${mangaId}_chaptersOrder`, next);
+      return next;
+    });
+  };
+
   const {
     data: mangaDetails,
     isLoading: mangaLoading,
@@ -119,7 +138,6 @@ function MangaChaptersListContent() {
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
-  // Get manga chapters
   const {
     data: chapters,
     isLoading,
@@ -234,7 +252,7 @@ function MangaChaptersListContent() {
         <div className="mb-4 mt-8 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <div className="w-full max-w-sm md:max-w-md">
             <SearchInput
-              type="text"
+              type="search"
               placeholder="Search chapters..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -244,13 +262,7 @@ function MangaChaptersListContent() {
           <Button
             variant="outline"
             size="icon-lg"
-            // className="h-10 w-10 p-0"
-            onClick={() => {
-              setIsSortPending(true);
-              setChaptersOrder((prev) =>
-                prev === "ascending" ? "descending" : "ascending",
-              );
-            }}
+            onClick={handleOrderChange}
             aria-label={`Toggle chapters order, current: ${chaptersOrder}`}
           >
             <HugeiconsIcon

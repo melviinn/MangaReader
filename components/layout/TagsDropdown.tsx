@@ -64,7 +64,7 @@ const TagsDropdown = ({
 }: TagsDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const triggerClasses = [
-    "w-full justify-between self-start gap-8",
+    "w-full justify-between self-start",
     triggerClassName,
   ]
     .filter(Boolean)

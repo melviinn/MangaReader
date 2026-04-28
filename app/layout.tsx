@@ -2,7 +2,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import Providers from "@/lib/providers";
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Figtree, Outfit } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -11,12 +11,18 @@ const outfit = Outfit({
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-figtree",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: {
     default: "MangaReader",
     template: "MangaReader | %s",
   },
-  description: "Read your favorite manga online for free. Powered by MangaDex.",
+  description: "Browse and read thousands of mangas for free. Powered by MangaDex.",
   keywords: ["manga", "manga reader", "read manga online", "mangadex"],
   openGraph: {
     type: "website",
@@ -36,11 +42,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="dark"
       suppressHydrationWarning
       suppressContentEditableWarning
     >
-      <body className={`${outfit.variable} antialiased min-h-dvh`}>
+      <body
+        className={`${outfit.variable} ${figtree.variable} antialiased min-h-dvh`}
+      >
         <Providers>
           <div className="min-h-dvh flex flex-col">
             <Navbar />
