@@ -2,12 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  DEFAULT_SORT,
-  normalizeSortValue,
-  type SortValue,
-} from "@/lib/types/mangaSort";
-import type { MangaResponseType } from "@/lib/types/mangaType";
-import {
   ArrowDown01Icon,
   ArrowUp01Icon,
   FilterIcon,
@@ -16,8 +10,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { type FormEvent } from "react";
+
 import { ErrorMessage } from "../ErrorMessage";
 import { FiltersDropdown } from "../ui/filters-dropdown";
 import { MangaPagination } from "../ui/pagination";
@@ -32,21 +26,17 @@ import {
 } from "../ui/select";
 import { MangasSkeleton } from "./Manga/MangasSkeleton";
 import { MangasView } from "./Manga/MangasView";
+import { TagsDropdown, TagsDropdownChange } from "./TagsDropdown";
+
 import {
-  TagsDropdown,
-  type TagFilterMode,
-  type TagsDropdownChange,
-} from "./TagsDropdown";
+  ContentRatingFilter,
+  MangaStatusFilter,
+  useMangaFilters,
+} from "@/hooks/useMangaFilters";
+import { DEFAULT_SORT, type SortValue } from "@/lib/types/mangaSort";
+import type { MangaResponseType } from "@/lib/types/mangaType";
 
-type MangaStatusFilter =
-  | "all"
-  | "ongoing"
-  | "completed"
-  | "hiatus"
-  | "cancelled";
-type ContentRatingFilter = "safe" | "suggestive" | "erotica";
-
-const STATUS_FILTER_OPTIONS: { value: MangaStatusFilter; label: string }[] = [
+const STATUS_FILTER_OPTIONS = [
   { value: "all", label: "All" },
   { value: "ongoing", label: "Ongoing" },
   { value: "completed", label: "Finished" },
@@ -54,17 +44,11 @@ const STATUS_FILTER_OPTIONS: { value: MangaStatusFilter; label: string }[] = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
-const CONTENT_RATING_OPTIONS: {
-  value: ContentRatingFilter;
-  label: string;
-}[] = [
+const CONTENT_RATING_OPTIONS = [
   { value: "safe", label: "Safe" },
   { value: "suggestive", label: "Suggestive" },
   { value: "erotica", label: "Erotica" },
 ];
-
-const DEFAULT_STATUS_FILTER: MangaStatusFilter = "all";
-const DEFAULT_CONTENT_RATING: ContentRatingFilter = "safe";
 
 async function fetchMangas(
   search: string,
@@ -72,71 +56,54 @@ async function fetchMangas(
   language: string,
   sort: SortValue,
   tagIds: string[],
-  tagFilterMode: TagFilterMode,
-  status: MangaStatusFilter,
-  contentRating: ContentRatingFilter,
+  tagFilterMode: any,
+  status: any,
+  contentRating: any,
 ): Promise<MangaResponseType> {
   const limit = 24;
   const offset = (page - 1) * limit;
+
   const params = new URLSearchParams({
     limit: String(limit),
     offset: String(offset),
     language,
     sort,
   });
-  if (search.trim() !== "") params.append("title", search);
 
-  if (tagIds.length > 0) {
+  if (search.trim()) params.append("title", search);
+  if (tagIds.length) {
     params.append("tagIds", tagIds.join(","));
     params.append("tagMode", tagFilterMode);
   }
-
-  if (status !== DEFAULT_STATUS_FILTER) params.append("status", status);
-
-  if (contentRating !== DEFAULT_CONTENT_RATING)
-    params.append("contentRating", contentRating);
+  if (status !== "all") params.append("status", status);
+  if (contentRating !== "safe") params.append("contentRating", contentRating);
 
   const res = await fetch(`/api/manga?${params.toString()}`);
-  if (!res.ok)
-    throw new Error("Une erreur est survenue lors du chargement des mangas.");
+  if (!res.ok) throw new Error("Erreur chargement mangas");
   return res.json();
 }
 
 export default function HomePage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const search = searchParams.get("search") || "";
-  const page = Number(searchParams.get("page")) || 1;
-  const language = searchParams.get("language") || "en";
-  const sortMode = normalizeSortValue(searchParams.get("sort"));
-  const selectedTagIds = (searchParams.get("tags") || "")
-    .split(",")
-    .map((tagId) => tagId.trim())
-    .filter(Boolean);
-  const tagFilterMode: TagFilterMode =
-    searchParams.get("tagMode") === "exclude" ? "exclude" : "include";
-  const statusFilter: MangaStatusFilter =
-    searchParams.get("status") === "ongoing" ||
-    searchParams.get("status") === "completed" ||
-    searchParams.get("status") === "hiatus" ||
-    searchParams.get("status") === "cancelled"
-      ? (searchParams.get("status") as MangaStatusFilter)
-      : DEFAULT_STATUS_FILTER;
-  const contentRatingFilter: ContentRatingFilter =
-    searchParams.get("contentRating") === "suggestive" ||
-    searchParams.get("contentRating") === "erotica"
-      ? (searchParams.get("contentRating") as ContentRatingFilter)
-      : DEFAULT_CONTENT_RATING;
-  const activeTagsCount = selectedTagIds.length;
-  const layoutFromURL =
-    searchParams.get("layout") === "compact" ? "compact" : "grid";
-  const headerSectionRef = useRef<HTMLDivElement>(null);
-
-  const [searchInput, setSearchInput] = useState(search);
-  const [layoutMode, setLayoutMode] = useState<"grid" | "compact">(
-    layoutFromURL,
-  );
-  const [isFiltersVisible, setIsFiltersVisible] = useState(false);
+  const {
+    search,
+    page,
+    language,
+    sortMode,
+    selectedTagIds,
+    tagFilterMode,
+    statusFilter,
+    contentRatingFilter,
+    layoutMode,
+    isFiltersVisible,
+    searchInput,
+    userSortMode,
+    headerSectionRef,
+    setSearchInput,
+    setLayoutMode,
+    setIsFiltersVisible,
+    setUserSortMode,
+    updateURL,
+  } = useMangaFilters();
 
   const { data, isLoading, isError, isFetching } = useQuery<
     MangaResponseType,
@@ -168,52 +135,19 @@ export default function HomePage() {
     placeholderData: keepPreviousData,
   });
 
-  useEffect(() => {
-    setSearchInput(search);
-  }, [search]);
-
-  useEffect(() => {
-    setLayoutMode(layoutFromURL);
-  }, [layoutFromURL]);
-
-  const updateURL = (
-    newSearch: string,
-    newPage: number,
-    newLayout: "grid" | "compact" = layoutMode,
-    newSort: SortValue = sortMode,
-    newTagIds: string[] = selectedTagIds,
-    newTagFilterMode: TagFilterMode = tagFilterMode,
-    newStatus: MangaStatusFilter = statusFilter,
-    newContentRating: ContentRatingFilter = contentRatingFilter,
-  ) => {
-    const params = new URLSearchParams();
-    if (newSearch.trim()) params.set("search", newSearch);
-
-    if (language !== "en") params.set("language", language);
-
-    if (newPage > 1) params.set("page", String(newPage));
-
-    if (newLayout !== "grid") params.set("layout", newLayout);
-
-    if (newSort !== DEFAULT_SORT) params.set("sort", newSort);
-
-    if (newTagIds.length > 0) params.set("tags", newTagIds.join(","));
-
-    if (newTagFilterMode !== "include") params.set("tagMode", newTagFilterMode);
-
-    if (newStatus !== DEFAULT_STATUS_FILTER) params.set("status", newStatus);
-
-    if (newContentRating !== DEFAULT_CONTENT_RATING)
-      params.set("contentRating", newContentRating);
-
-    router.replace(`/?${params.toString()}`, { scroll: false });
-  };
+  // ===== Handlers =====
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const submittedSearch = searchInput.trim();
 
-    updateURL(submittedSearch, 1);
+    updateURL(
+      submittedSearch,
+      1,
+      layoutMode,
+      submittedSearch ? "best_match" : sortMode,
+    );
+
     headerSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -221,12 +155,13 @@ export default function HomePage() {
     const value = e.target.value;
     setSearchInput(value);
 
-    if (value.trim() === "") updateURL("", 1);
+    if (value.trim() === "") updateURL("", 1, layoutMode, userSortMode);
   };
 
   const handlePageChange = (newPage: number | ((p: number) => number)) => {
     const resolvedPage =
       typeof newPage === "function" ? newPage(page) : newPage;
+
     updateURL(search, resolvedPage);
     headerSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -237,7 +172,21 @@ export default function HomePage() {
   };
 
   const handleSortChange = (newSort: SortValue) => {
+    setUserSortMode(newSort);
     updateURL(search, 1, layoutMode, newSort);
+  };
+
+  const handleResetFilters = () => {
+    updateURL(
+      search,
+      1,
+      layoutMode,
+      DEFAULT_SORT,
+      [],
+      "include",
+      "all",
+      "safe",
+    );
   };
 
   const handleTagsChange = ({
@@ -285,24 +234,10 @@ export default function HomePage() {
   };
 
   const hasActiveFilters =
-    activeTagsCount > 0 ||
-    sortMode !== DEFAULT_SORT ||
+    selectedTagIds.length > 0 ||
     tagFilterMode !== "include" ||
-    statusFilter !== DEFAULT_STATUS_FILTER ||
-    contentRatingFilter !== DEFAULT_CONTENT_RATING;
-
-  const handleResetFilters = () => {
-    updateURL(
-      search,
-      1,
-      layoutMode,
-      DEFAULT_SORT,
-      [],
-      "include",
-      DEFAULT_STATUS_FILTER,
-      DEFAULT_CONTENT_RATING,
-    );
-  };
+    statusFilter !== "all" ||
+    contentRatingFilter !== "safe";
 
   return (
     <main className="flex flex-col">
@@ -524,8 +459,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* No need to check for layout shift because it doesn't render if the mangas are not loaded */}
-      <div className="mb-8 max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 mb-10">
         <MangaPagination
           currentPage={page}
           total={data?.total}

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: "MangaReader",
     template: "MangaReader | %s",
   },
-  description: "Read your favorite manga online for free. Powered by MangaDex.",
+  description: "Browse and read thousands of mangas for free. Powered by MangaDex.",
   keywords: ["manga", "manga reader", "read manga online", "mangadex"],
   openGraph: {
     type: "website",

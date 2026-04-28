@@ -32,24 +32,29 @@ export const MangaChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
   }, [mangaId]);
 
   const handleChapterClick = (chapterId: string) => {
-    const key = `manga_${mangaId}_readChapters`;
-    let updated: string[] = [];
-    try {
-      const stored = localStorage.getItem(key);
-      const arr = stored ? JSON.parse(stored) : [];
-      if (!arr.includes(chapterId)) {
-        updated = [...arr, chapterId];
+    // On effectue la navigation AVANT de marquer comme lu pour éviter le flash de l'icône
+    router.push(`/manga/${mangaId}/${chapterId}`);
+    // Facultatif : si tu veux marquer comme lu uniquement au retour, laisse comme ça
+    // Si tu veux marquer comme lu après un délai, décommente ci-dessous :
+    setTimeout(() => {
+      const key = `manga_${mangaId}_readChapters`;
+      let updated: string[] = [];
+      try {
+        const stored = localStorage.getItem(key);
+        const arr = stored ? JSON.parse(stored) : [];
+        if (!arr.includes(chapterId)) {
+          updated = [...arr, chapterId];
+          localStorage.setItem(key, JSON.stringify(updated));
+          setReadChapters(updated);
+        } else {
+          updated = arr;
+        }
+      } catch {
+        updated = [chapterId];
         localStorage.setItem(key, JSON.stringify(updated));
         setReadChapters(updated);
-      } else {
-        updated = arr;
       }
-    } catch {
-      updated = [chapterId];
-      localStorage.setItem(key, JSON.stringify(updated));
-      setReadChapters(updated);
-    }
-    router.push(`/manga/${mangaId}/${chapterId}`);
+    }, 500);
   };
 
   if (!chapters?.length) return null;
@@ -90,7 +95,6 @@ export const MangaChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
                       : "bg-card hover:border-primary hover:bg-card/80")
                   }
                 >
-                  {/* Icone check en haut à droite si lu */}
                   {isRead && (
                     <span className="absolute top-2 right-2 z-10 text-yellow-400">
                       <HugeiconsIcon icon={ViewIcon} className="size-4" />
