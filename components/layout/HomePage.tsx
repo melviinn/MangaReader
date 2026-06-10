@@ -10,7 +10,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 
 import { ErrorMessage } from "../ErrorMessage";
 import { FiltersDropdown } from "../ui/filters-dropdown";
@@ -145,6 +145,7 @@ export default function HomePage() {
   } = useMangaFilters();
 
   const [readChapters, setReadChapters] = useState<ReadChaptersEntry[]>([]);
+  const mangasViewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setReadChapters(getAllReadChapters());
@@ -155,10 +156,14 @@ export default function HomePage() {
     [readChapters],
   );
 
+  console.log("readMangasId", readMangasId);
+
   const { data: readMangasData } = useQuery({
     queryKey: ["readMangas", readMangasId],
     queryFn: () => fetchMangasByIds(readMangasId),
     enabled: readMangasId.length > 0,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const sortedReadMangas = useMemo(() => {
@@ -212,7 +217,8 @@ export default function HomePage() {
       layoutMode,
       searchInput.trim() ? "best_match" : sortMode,
     );
-    headerSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    mangasViewRef.current?.scrollIntoView({ behavior: "smooth" });
+    // headerSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const onChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -520,12 +526,14 @@ export default function HomePage() {
 
           {isFetching && <MangasSkeleton layout={layoutMode} />}
 
-          {isError && (
+          {!isFetching && isError && (
             <ErrorMessage message="Erreur lors du chargement des mangas." />
           )}
 
-          {!isLoading && !isError && (
-            <MangasView mangas={data?.mangas} layout={layoutMode} />
+          {!isFetching && !isError && (
+            <div ref={mangasViewRef} className="scroll-mt-20">
+              <MangasView mangas={data?.mangas} layout={layoutMode} />
+            </div>
           )}
         </div>
       </section>

@@ -25,11 +25,19 @@ export async function GET(request: NextRequest) {
     tagIds.push(fallbackSingleTagId);
   }
 
+  const ids = searchParams.getAll("ids[]");
+
   try {
     const url = new URL(`${process.env.BASE_API_URL}/manga`);
 
     if (title) {
       url.searchParams.append("title", title);
+    }
+
+    if (ids.length > 0) {
+      ids.forEach((id) => {
+        url.searchParams.append("ids[]", id);
+      });
     }
 
     url.searchParams.append("limit", limit.toString());
