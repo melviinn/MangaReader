@@ -37,12 +37,28 @@ function normalizeSortValue(value: string | null | undefined): SortValue {
     : DEFAULT_SORT;
 }
 
+const STATUS_FILTER_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "ongoing", label: "Ongoing" },
+  { value: "completed", label: "Finished" },
+  { value: "hiatus", label: "Hiatus" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const CONTENT_RATING_OPTIONS = [
+  { value: "safe", label: "Safe" },
+  { value: "suggestive", label: "Suggestive" },
+  { value: "erotica", label: "Erotica" },
+];
+
 export {
   DEFAULT_SORT,
   normalizeSortValue,
   SORT_OPTIONS,
   SORT_ORDER_MAP,
   SORT_VALUES,
+  STATUS_FILTER_OPTIONS,
+  CONTENT_RATING_OPTIONS
 };
 
 export type { SortValue };

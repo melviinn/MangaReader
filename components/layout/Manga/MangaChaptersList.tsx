@@ -111,7 +111,6 @@ function MangaChaptersListContent() {
   }, [mangaId]);
 
   // Sauvegarder la langue dans localStorage quand elle change
-
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
     localStorage.setItem(`manga_${mangaId}_language`, newLanguage);

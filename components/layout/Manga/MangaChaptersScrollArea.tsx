@@ -34,8 +34,6 @@ export const MangaChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
   const handleChapterClick = (chapterId: string) => {
     // On effectue la navigation AVANT de marquer comme lu pour éviter le flash de l'icône
     router.push(`/manga/${mangaId}/${chapterId}`);
-    // Facultatif : si tu veux marquer comme lu uniquement au retour, laisse comme ça
-    // Si tu veux marquer comme lu après un délai, décommente ci-dessous :
     setTimeout(() => {
       const key = `manga_${mangaId}_readChapters`;
       let updated: string[] = [];
@@ -45,9 +43,11 @@ export const MangaChaptersScrollArea: React.FC<ChaptersScrollAreaProps> = ({
         if (!arr.includes(chapterId)) {
           updated = [...arr, chapterId];
           localStorage.setItem(key, JSON.stringify(updated));
+          localStorage.setItem(`manga_${mangaId}_lastRead`, String(Date.now()));
           setReadChapters(updated);
         } else {
           updated = arr;
+          localStorage.setItem(`manga_${mangaId}_lastRead`, String(Date.now())); // ← et ici
         }
       } catch {
         updated = [chapterId];

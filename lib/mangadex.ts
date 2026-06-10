@@ -5,10 +5,7 @@ export function mangaDexHeaders(init?: HeadersInit): Headers {
   const headers = new Headers(init);
 
   if (!headers.has("User-Agent")) {
-    headers.set(
-      "User-Agent",
-      process.env.MANGADEX_USER_AGENT || DEFAULT_MANGADEX_USER_AGENT,
-    );
+    headers.set("User-Agent", DEFAULT_MANGADEX_USER_AGENT);
   }
 
   if (!headers.has("Accept")) {

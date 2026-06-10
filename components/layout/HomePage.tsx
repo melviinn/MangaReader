@@ -10,7 +10,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { ErrorMessage } from "../ErrorMessage";
 import { FiltersDropdown } from "../ui/filters-dropdown";
@@ -33,22 +33,14 @@ import {
   MangaStatusFilter,
   useMangaFilters,
 } from "@/hooks/useMangaFilters";
-import { DEFAULT_SORT, type SortValue } from "@/lib/types/mangaSort";
+import {
+  CONTENT_RATING_OPTIONS,
+  DEFAULT_SORT,
+  STATUS_FILTER_OPTIONS,
+  type SortValue,
+} from "@/lib/types/mangaSort";
 import type { MangaResponseType } from "@/lib/types/mangaType";
-
-const STATUS_FILTER_OPTIONS = [
-  { value: "all", label: "All" },
-  { value: "ongoing", label: "Ongoing" },
-  { value: "completed", label: "Finished" },
-  { value: "hiatus", label: "Hiatus" },
-  { value: "cancelled", label: "Cancelled" },
-];
-
-const CONTENT_RATING_OPTIONS = [
-  { value: "safe", label: "Safe" },
-  { value: "suggestive", label: "Suggestive" },
-  { value: "erotica", label: "Erotica" },
-];
+import { ReadMangasCard } from "./Manga/ReadMangasCard";
 
 async function fetchMangas(
   search: string,
@@ -83,6 +75,53 @@ async function fetchMangas(
   return res.json();
 }
 
+type ReadChaptersEntry = {
+  mangaId: string;
+  chapterIds: string[];
+  lastRead: number;
+};
+
+function getAllReadChapters(): ReadChaptersEntry[] {
+  const results: ReadChaptersEntry[] = [];
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+
+    // Match le pattern manga_${mangaId}_readChapters
+    const match = key.match(/^manga_(.+)_readChapters$/);
+    if (!match) continue;
+
+    const mangaId = match[1];
+
+    try {
+      const chapterIds = JSON.parse(localStorage.getItem(key) ?? "[]");
+      if (Array.isArray(chapterIds) && chapterIds.length > 0) {
+        results.push({
+          mangaId,
+          chapterIds,
+          lastRead: Number(
+            localStorage.getItem(`manga_${mangaId}_lastRead`) ?? 0,
+          ),
+        });
+      }
+    } catch {
+      // clé corrompue, on skip
+    }
+  }
+
+  return results;
+}
+
+async function fetchMangasByIds(ids: string[]) {
+  const params = new URLSearchParams();
+  ids.forEach((id) => params.append("ids[]", id));
+
+  const res = await fetch(`/api/manga?${params.toString()}`);
+  if (!res.ok) throw new Error("Erreur lors du chargement des mangas lus");
+  return res.json();
+}
+
 export default function HomePage() {
   const {
     search,
@@ -104,6 +143,34 @@ export default function HomePage() {
     setUserSortMode,
     updateURL,
   } = useMangaFilters();
+
+  const [readChapters, setReadChapters] = useState<ReadChaptersEntry[]>([]);
+
+  useEffect(() => {
+    setReadChapters(getAllReadChapters());
+  }, []);
+
+  const readMangasId = useMemo(
+    () => readChapters.map((entry) => entry.mangaId),
+    [readChapters],
+  );
+
+  const { data: readMangasData } = useQuery({
+    queryKey: ["readMangas", readMangasId],
+    queryFn: () => fetchMangasByIds(readMangasId),
+    enabled: readMangasId.length > 0,
+  });
+
+  const sortedReadMangas = useMemo(() => {
+    if (!readMangasData?.mangas) return [];
+    return [...readMangasData.mangas].sort((a, b) => {
+      const aLastRead =
+        readChapters.find((e) => e.mangaId === a.id)?.lastRead ?? 0;
+      const bLastRead =
+        readChapters.find((e) => e.mangaId === b.id)?.lastRead ?? 0;
+      return bLastRead - aLastRead;
+    });
+  }, [readMangasData, readChapters]);
 
   const { data, isLoading, isError, isFetching } = useQuery<
     MangaResponseType,
@@ -139,22 +206,18 @@ export default function HomePage() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const submittedSearch = searchInput.trim();
-
     updateURL(
-      submittedSearch,
+      searchInput.trim(),
       1,
       layoutMode,
-      submittedSearch ? "best_match" : sortMode,
+      searchInput.trim() ? "best_match" : sortMode,
     );
-
     headerSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const onChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchInput(value);
-
     if (value.trim() === "") updateURL("", 1, layoutMode, userSortMode);
   };
 
@@ -284,7 +347,7 @@ export default function HomePage() {
             <div className="flex items-center gap-8 mt-10 text-sm">
               <div className="flex flex-col items-center">
                 <span className="text-2xl font-bold text-primary">10K+</span>
-                <span className="text-muted-foreground">Manga Titles</span>
+                <span className="text-muted-foreground">Mangas</span>
               </div>
               <div className="w-px h-10 bg-border" />
               <div className="flex flex-col items-center">
@@ -300,6 +363,14 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {readMangasData && readMangasData.mangas && (
+        <section>
+          <div className="max-w-7xl mx-auto px-4">
+            <ReadMangasCard readMangas={sortedReadMangas} />
+          </div>
+        </section>
+      )}
 
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">

@@ -7,7 +7,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-heading: var(--font-outfit);
-  --font-sans: var(--font-ibm-plex-sans);
+  --font-sans: var(--font-figtree);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -50,17 +50,17 @@
   --font-heading: "Outfit", sans-serif;
   --font-sans: "Figtree", sans-serif;
   --radius: 0.5rem;
-  --background: #040f0f;
+  --background: oklch(0.1569 0.018 195.48);
   --foreground: oklch(0.981 0.004 296.252);
   --muted: oklch(0.242 0.009 295.659);
   --muted-foreground: oklch(0.68 0.036 295.353);
   --popover: oklch(0.117 0.018 295.75);
   --popover-foreground: oklch(0.981 0.004 296.252);
-  --card: #242424;
+  --card: oklch(0.2603 0 0);
   --card-foreground: oklch(0.991 0.002 296.292);
   --border: oklch(0.278 0.03 256.848);
   --input: oklch(0.278 0.03 256.848);
-  --primary: #e4ad4f;
+  --primary: oklch(0.7811 0.1275 78.3);
   --primary-foreground: #2b2115;
   --secondary: oklch(0.199 0.006 295.741);
   --secondary-foreground: oklch(0.745 0.016 295.941);
@@ -68,7 +68,7 @@
   --accent-foreground: oklch(0.779 0.025 295.754);
   --destructive: oklch(0.619 0.242 11.329);
   --destructive-foreground: oklch(1 0 180);
-  --ring: #dbaf62;
+  --ring: oklch(0.7779 0.1083 80.09);
   --chart-1: oklch(0.513 0.264 281.703);
   --chart-2: oklch(0.199 0.006 295.741);
   --chart-3: oklch(0.246 0.018 295.001);
@@ -76,28 +76,23 @@
   --chart-5: oklch(0.511 0.27 280.985);
 }
 
-body {
-  font-family: var(--font-sans);
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-heading);
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
   button {
     @apply cursor-pointer;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
   }
 }
 
